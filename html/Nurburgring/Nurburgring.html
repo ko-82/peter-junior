@@ -1,0 +1,472 @@
+
+<html>
+  <head><title>HTML Pandas Dataframe with CSS</title></head>
+  <link rel="stylesheet" type="text/css" href="external.css"/>
+  <body>
+    <table border="1" class="dataframe ldb-table">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Rank</th>
+      <th>Driver</th>
+      <th>Car</th>
+      <th>Lap Time</th>
+      <th>Sector 1</th>
+      <th>Sector 2</th>
+      <th>Sector 3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Michael Moening (MMO)</td>
+      <td>Aston Martin Vantage V8 2019</td>
+      <td>01:55.110</td>
+      <td>00:55.105</td>
+      <td>00:43.075</td>
+      <td>00:16.930</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Travis Robinson (TBR)</td>
+      <td>Lamborghini Huracan Evo 2019</td>
+      <td>01:55.180</td>
+      <td>00:55.207</td>
+      <td>00:42.955</td>
+      <td>00:17.017</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Chris Stefiuk (STE)</td>
+      <td>Lamborghini Huracan Evo 2019</td>
+      <td>01:55.467</td>
+      <td>00:55.160</td>
+      <td>00:43.357</td>
+      <td>00:16.950</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Tyler James (TYJ)</td>
+      <td>BMW M4 GT3 2022</td>
+      <td>01:55.472</td>
+      <td>00:55.397</td>
+      <td>00:43.207</td>
+      <td>00:16.867</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Chris Hannigan (HAN)</td>
+      <td>Bentley Continental GT3 2018</td>
+      <td>01:55.475</td>
+      <td>00:55.482</td>
+      <td>00:43.065</td>
+      <td>00:16.927</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Robert Arendac (ARE)</td>
+      <td>Mercedes AMG GT3 2020</td>
+      <td>01:55.487</td>
+      <td>00:55.230</td>
+      <td>00:43.250</td>
+      <td>00:17.007</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Taylor Carter (WTF)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:55.545</td>
+      <td>00:55.427</td>
+      <td>00:43.340</td>
+      <td>00:16.777</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Douglas Mitchell (DJM)</td>
+      <td>BMW M4 GT3 2022</td>
+      <td>01:55.680</td>
+      <td>00:55.362</td>
+      <td>00:43.257</td>
+      <td>00:17.060</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>J. Taka (TAK)</td>
+      <td>BMW M4 GT3 2022</td>
+      <td>01:55.782</td>
+      <td>00:55.310</td>
+      <td>00:43.355</td>
+      <td>00:17.117</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Dominic Duran (PLY)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:55.797</td>
+      <td>00:55.505</td>
+      <td>00:43.277</td>
+      <td>00:17.015</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Russell Allen (ALL)</td>
+      <td>Nissan GT-R Nismo GT3 2018</td>
+      <td>01:55.820</td>
+      <td>00:55.387</td>
+      <td>00:43.167</td>
+      <td>00:17.265</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>Evan Kim (KIM)</td>
+      <td>Bentley Continental GT3 2018</td>
+      <td>01:56.337</td>
+      <td>00:55.502</td>
+      <td>00:43.615</td>
+      <td>00:17.220</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>Peter Venhaus (PTR)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:56.340</td>
+      <td>00:55.532</td>
+      <td>00:43.637</td>
+      <td>00:17.170</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>Mathieu Beaudin (MBB)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:56.425</td>
+      <td>00:55.532</td>
+      <td>00:43.655</td>
+      <td>00:17.237</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>Ethan Mozie | DOR | (MOZ)</td>
+      <td>Audi R8 LMS Evo 2019</td>
+      <td>01:56.482</td>
+      <td>00:55.477</td>
+      <td>00:43.770</td>
+      <td>00:17.235</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>Colin Matyac (CTM)</td>
+      <td>Nissan GT-R Nismo GT3 2018</td>
+      <td>01:56.512</td>
+      <td>00:55.672</td>
+      <td>00:43.265</td>
+      <td>00:17.575</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>Jack Fletcher (JSF)</td>
+      <td>Bentley Continental GT3 2018</td>
+      <td>01:56.567</td>
+      <td>00:55.970</td>
+      <td>00:43.317</td>
+      <td>00:17.280</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>Adam Thomas (TOM)</td>
+      <td>Aston Martin Vantage V8 2019</td>
+      <td>01:56.667</td>
+      <td>00:55.970</td>
+      <td>00:43.567</td>
+      <td>00:17.130</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>Matthew Schwartz (SCH)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:56.725</td>
+      <td>00:55.797</td>
+      <td>00:43.907</td>
+      <td>00:17.020</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>Matt Morrison[TSR] (MOR)</td>
+      <td>Audi R8 LMS Evo 2019</td>
+      <td>01:56.855</td>
+      <td>00:56.287</td>
+      <td>00:43.405</td>
+      <td>00:17.162</td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>Kyle  Turner (KHT)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:56.970</td>
+      <td>00:55.690</td>
+      <td>00:43.930</td>
+      <td>00:17.350</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>Victor Diaz (VDI)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:57.187</td>
+      <td>00:56.020</td>
+      <td>00:43.722</td>
+      <td>00:17.445</td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>Mathieu Beaudin (MBB)</td>
+      <td>Mercedes AMG GT3 2020</td>
+      <td>01:57.287</td>
+      <td>00:55.942</td>
+      <td>00:44.015</td>
+      <td>00:17.330</td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>Curtis Lee (LEE)</td>
+      <td>Audi R8 LMS Evo 2019</td>
+      <td>01:57.290</td>
+      <td>00:56.087</td>
+      <td>00:43.790</td>
+      <td>00:17.412</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>Josh Damiani (DAM)</td>
+      <td>Aston Martin Vantage V8 2019</td>
+      <td>01:57.360</td>
+      <td>00:56.282</td>
+      <td>00:43.785</td>
+      <td>00:17.292</td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>Damon Morla (DAM)</td>
+      <td>BMW M4 GT3 2022</td>
+      <td>01:57.362</td>
+      <td>00:56.197</td>
+      <td>00:43.605</td>
+      <td>00:17.560</td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>David Taflevich (PLY)</td>
+      <td>BMW M4 GT3 2022</td>
+      <td>01:57.382</td>
+      <td>00:56.352</td>
+      <td>00:43.782</td>
+      <td>00:17.247</td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>Justin Burrage (BUR)</td>
+      <td>Aston Martin Vantage V8 2019</td>
+      <td>01:57.587</td>
+      <td>00:56.122</td>
+      <td>00:44.055</td>
+      <td>00:17.410</td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>Tommy Dong (TDO)</td>
+      <td>Lexus RC F GT3</td>
+      <td>01:57.645</td>
+      <td>00:56.635</td>
+      <td>00:43.790</td>
+      <td>00:17.220</td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>Travis Robinson (TBR)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:57.720</td>
+      <td>00:56.167</td>
+      <td>00:44.250</td>
+      <td>00:17.302</td>
+    </tr>
+    <tr>
+      <td>31</td>
+      <td>John Foguth (JFO)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:57.760</td>
+      <td>00:56.105</td>
+      <td>00:44.310</td>
+      <td>00:17.345</td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>Dustin Fickert (DRF)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:58.025</td>
+      <td>00:56.510</td>
+      <td>00:44.062</td>
+      <td>00:17.452</td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>Joshua Lizasuain (LIZ)</td>
+      <td>Mercedes AMG GT3 2020</td>
+      <td>01:58.052</td>
+      <td>00:55.765</td>
+      <td>00:44.002</td>
+      <td>00:18.285</td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>Eduardo Rodrï¿½guez (RDZ)</td>
+      <td>Aston Martin Vantage V8 2019</td>
+      <td>01:58.227</td>
+      <td>00:56.525</td>
+      <td>00:44.017</td>
+      <td>00:17.685</td>
+    </tr>
+    <tr>
+      <td>35</td>
+      <td>Colin O'Leary (O'L)</td>
+      <td>Ferrari 488 GT3 Evo</td>
+      <td>01:58.242</td>
+      <td>00:56.457</td>
+      <td>00:44.117</td>
+      <td>00:17.667</td>
+    </tr>
+    <tr>
+      <td>36</td>
+      <td>Kyle Martin (PLY)</td>
+      <td>Porsche 991 II GT3 R 2019</td>
+      <td>01:58.300</td>
+      <td>00:56.662</td>
+      <td>00:44.312</td>
+      <td>00:17.325</td>
+    </tr>
+    <tr>
+      <td>37</td>
+      <td>Andre Reguero (REG)</td>
+      <td>Lexus RC F GT3</td>
+      <td>01:58.485</td>
+      <td>00:57.080</td>
+      <td>00:43.785</td>
+      <td>00:17.620</td>
+    </tr>
+    <tr>
+      <td>38</td>
+      <td>Tony Proenza (PLY)</td>
+      <td>Porsche 991 II GT3 R 2019</td>
+      <td>01:58.647</td>
+      <td>00:56.890</td>
+      <td>00:44.302</td>
+      <td>00:17.455</td>
+    </tr>
+    <tr>
+      <td>39</td>
+      <td>colin shea (PLY)</td>
+      <td>Ferrari 488 GT3 Evo</td>
+      <td>01:58.707</td>
+      <td>00:56.775</td>
+      <td>00:44.172</td>
+      <td>00:17.760</td>
+    </tr>
+    <tr>
+      <td>40</td>
+      <td>Gavin Thomas (THO)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:58.800</td>
+      <td>00:56.842</td>
+      <td>00:44.550</td>
+      <td>00:17.407</td>
+    </tr>
+    <tr>
+      <td>41</td>
+      <td>Hesham Rimzk (RIM)</td>
+      <td>Ferrari 488 GT3 Evo</td>
+      <td>01:58.815</td>
+      <td>00:56.967</td>
+      <td>00:44.170</td>
+      <td>00:17.677</td>
+    </tr>
+    <tr>
+      <td>42</td>
+      <td>Dae Hee Yun (HYD)</td>
+      <td>Aston Martin Vantage V8 2019</td>
+      <td>01:58.835</td>
+      <td>00:56.437</td>
+      <td>00:44.640</td>
+      <td>00:17.757</td>
+    </tr>
+    <tr>
+      <td>43</td>
+      <td>Nathan Schaefer (LFG)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:58.852</td>
+      <td>00:56.805</td>
+      <td>00:44.302</td>
+      <td>00:17.745</td>
+    </tr>
+    <tr>
+      <td>44</td>
+      <td>Jacob Wolfman (WOL)</td>
+      <td>Bentley Continental GT3 2018</td>
+      <td>01:59.000</td>
+      <td>00:29.282</td>
+      <td>00:23.425</td>
+      <td>00:37.172</td>
+    </tr>
+    <tr>
+      <td>45</td>
+      <td>Alex Daniel (WTF)</td>
+      <td>BMW M4 GT3 2022</td>
+      <td>01:59.405</td>
+      <td>00:56.870</td>
+      <td>00:44.730</td>
+      <td>00:17.805</td>
+    </tr>
+    <tr>
+      <td>46</td>
+      <td>Hesham Rimzk (RIM)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>01:59.482</td>
+      <td>00:57.157</td>
+      <td>00:44.527</td>
+      <td>00:17.797</td>
+    </tr>
+    <tr>
+      <td>47</td>
+      <td>Will Forsling (WMF)</td>
+      <td>BMW M4 GT3 2022</td>
+      <td>01:59.970</td>
+      <td>00:57.922</td>
+      <td>00:44.370</td>
+      <td>00:17.677</td>
+    </tr>
+    <tr>
+      <td>48</td>
+      <td>Dan Meyer (PLY)</td>
+      <td>Ferrari 488 GT3 Evo</td>
+      <td>02:02.520</td>
+      <td>00:57.727</td>
+      <td>00:46.587</td>
+      <td>00:18.205</td>
+    </tr>
+    <tr>
+      <td>49</td>
+      <td>Samuel Varghese (PLY)</td>
+      <td>McLaren 720S GT3 Special</td>
+      <td>02:02.962</td>
+      <td>00:58.647</td>
+      <td>00:45.525</td>
+      <td>00:18.790</td>
+    </tr>
+    <tr>
+      <td>50</td>
+      <td>Samuel Varghese (PLY)</td>
+      <td>Bentley Continental GT3 2018</td>
+      <td>02:05.325</td>
+      <td>00:59.652</td>
+      <td>00:47.070</td>
+      <td>00:18.602</td>
+    </tr>
+  </tbody>
+</table>
+  </body>
+</html>

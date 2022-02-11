@@ -1,18 +1,23 @@
 import constants
+import pj_leaderboard
 import keys
+
 from typing import NamedTuple, Type
 import collections
 import re
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 import math
 import argparse
+import urllib.parse
+from os import path
 
 import nextcord
 from nextcord.ext.commands import context
 from nextcord.ext.commands.flags import convert_flag
 from nextcord import user
 from nextcord.ext import commands
-from nextcord.ext import tasks
+
+from playwright.async_api import async_playwright
 
 
 bot = commands.Bot(command_prefix='$$')
@@ -29,6 +34,22 @@ def calc_fuel(total_time:int, lap_time_str:str, fuel_per_lap:float):
     
     return Fuel(total_fuel, total_fuel_fm)
 
+def get_leaderboard(track:str) -> pj_leaderboard.Leaderboard:
+    filename = path.join("csvs", f"{track}.csv")
+    leaderboard = pj_leaderboard.Leaderboard.read_leaderboard(file_path=filename)
+    leaderboard.track = track
+    return leaderboard
+
+async def html_screenshot(html_path, html_dir_path):
+    html_path_abs = path.abspath(html_path).replace("\\","/")
+    html_url = urllib.parse.quote(html_path_abs, safe=":/")
+    img_path = path.join(html_dir_path, "table.png")
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
+        response = await page.goto(f"file:///{html_url}")
+        await page.locator(".ldb-table").screenshot(path=img_path)
+        await browser.close()
 
 @bot.event
 async def on_ready():
@@ -89,4 +110,50 @@ async def fuel(ctx, params:str):
         )
     )
     return
+
+@bot.command(name="updateldb")
+async def update_leaderboard(ctx, track, pages = 3, pw = True):
+    leaderboard = get_leaderboard(track=track)
+    leaderboard.update(pages=pages, pw=pw)
+    await ctx.channel.send("Updated")
+    leaderboard.write_leaderboard(path.join("csvs", f"{leaderboard.track}.csv"))
+
+@bot.command(name="printldb")
+async def print_leaderboard(ctx, track):
+    leaderboard = get_leaderboard(track=track)
+    leaderboard.write_leaderboard(file_path=path.join("print", f"{leaderboard.track}.txt"), suppress_id=True, space_delim=True, trail_trim=True)
+    await ctx.channel.send(file=nextcord.File(fp=path.join("print", f"{leaderboard.track}.txt")))
+    
+@bot.command(name="printldbshort")
+async def print_leaderboard_short(ctx, track):
+    leaderboard = get_leaderboard(track=track)
+    ldb_embed = leaderboard.generate_embed_compatible()
+    embed = nextcord.Embed(title=f"{leaderboard.track} leaderboard")
+    embed.add_field(name="Driver", value=ldb_embed.driver, inline=True)
+    embed.add_field(name="Car", value=ldb_embed.car, inline=True)
+    embed.add_field(name="Time", value=ldb_embed.time, inline=True)
+    embed.timestamp = leaderboard.last_updated
+
+    await ctx.channel.send(embed=embed)
+
+@bot.command(name="genscr")
+@commands.has_role('Admin')
+async def generate_screenshot(ctx, track):
+    leaderboard = get_leaderboard(track=track)
+    leaderboard.to_html()
+    await html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
+
+    if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
+        await ctx.channel.send("No image file")
+    else:
+        with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
+            image = nextcord.File(f)
+            await ctx.channel.send(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
+
+@bot.command(name="db_timestamp")
+async def db_timestamp(ctx):
+    now = datetime.now(timezone.utc)
+    timestamp = now.timestamp()
+    await ctx.channel.send(f"<t:{int(timestamp)}:F>")
+
 bot.run(keys.BOT_TOKEN)

@@ -1,1 +1,6 @@
 nextcord >= 2.0.0a4
+requests >= 2.27
+playwright >= 1.18
+beautifulsoup4 >= 4
+python-dateutil >= 2.8
+pandas >= 1.4
