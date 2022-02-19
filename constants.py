@@ -409,5 +409,6 @@ body
 
 session_exclude = {
     "Silverstone": ['220203_033813_FP', '220203_043850_FP', '220207_002120_FP', '220206_194749_FP'],
-    "Imola": []
+    "Imola": [],
+    "Spa": []
 }

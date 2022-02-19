@@ -148,7 +148,7 @@ class Session:
                 
                 entry.id = driver['playerId']
                 
-                min_lap = 25199999 #6 hours max session time (Arbitrary initial minimum)
+                min_lap = 3599999 #6 hours max session time (Arbitrary initial minimum)
                 min_lap_s1 = 0
                 min_lap_s2 = 0
                 min_lap_s3 = 0
