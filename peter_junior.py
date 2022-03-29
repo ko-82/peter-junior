@@ -70,7 +70,7 @@ async def ssshelp(ctx):
 @bot.command()
 async def setup(ctx, params:str):
     if (params not in constants.setup_dict.keys()):
-        await ctx.channel.send("Command not found")
+        await ctx.channel.send("Git gud kid")
     else:
         await ctx.channel.send(constants.setup_dict[params])
     return

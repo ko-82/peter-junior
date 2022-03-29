@@ -349,6 +349,7 @@ car_model_dict = {
     24 : 'Ferrari 488 GT3 Evo',
     25 : 'Mercedes AMG GT3 2020',
     30 : 'BMW M4 GT3 2022',
+    31 : 'Audi R8 LMS Evo II 2022',
     50 : 'Alpine A110 GT4',
     51 : 'Aston Martin Vantage GT4',
     52 : 'Audi R8 LMS GT4',
@@ -411,5 +412,7 @@ session_exclude = {
     "Silverstone": ['220203_033813_FP', '220203_043850_FP', '220207_002120_FP', '220206_194749_FP'],
     "Imola": [],
     "Spa": [],
-    "Suzuka": []
+    "Suzuka": [],
+    "Oulton Park": [],
+    "Monza": []
 }

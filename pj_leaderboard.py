@@ -141,7 +141,10 @@ class Session:
                 entry = Entry()
                 car_model = car['carModel']
                 car_id = car['carId']
-                entry.car = constants.car_model_dict[car_model]
+                if car_model in constants.car_model_dict:
+                    entry.car = constants.car_model_dict[car_model]
+                else:
+                    entry.car = "1996 Toyota Corolla"
                 
                 driver_name = f"{driver['firstName']} {driver['lastName']} ({driver['shortName']})"
                 entry.name = driver_name
