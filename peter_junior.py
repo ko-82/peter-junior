@@ -18,6 +18,7 @@ from nextcord import user
 from nextcord.ext import commands
 
 from playwright.async_api import async_playwright
+from pyppeteer import launch
 
 
 bot = commands.Bot(command_prefix='$$')
@@ -50,6 +51,19 @@ async def html_screenshot(html_path, html_dir_path):
         response = await page.goto(f"file:///{html_url}")
         await page.locator(".ldb-table").screenshot(path=img_path)
         await browser.close()
+
+async def pyp_html_screenshot(html_path, html_dir_path):
+    html_path_abs = path.abspath(html_path).replace("\\","/")
+    html_url = urllib.parse.quote(html_path_abs, safe=":/")
+    img_path = path.join(html_dir_path, "table.png")
+
+    browser = await launch()
+    page = await browser.newPage()
+    await page.setViewport({"width": 1280, "height": 720})
+    response = await page.goto(f"file:///{html_url}")
+    element = await page.querySelector(".ldb-table")
+    await element.screenshot(path=img_path)
+    await browser.close()
 
 @bot.event
 async def on_ready():
@@ -142,6 +156,20 @@ async def generate_screenshot(ctx, track):
     leaderboard = get_leaderboard(track=track)
     leaderboard.to_html()
     await html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
+
+    if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
+        await ctx.channel.send("No image file")
+    else:
+        with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
+            image = nextcord.File(f)
+            await ctx.channel.send(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
+
+@bot.command(name="pypgenscr")
+@commands.has_role('Admin')
+async def generate_screenshot(ctx, track):
+    leaderboard = get_leaderboard(track=track)
+    leaderboard.to_html()
+    await pyp_html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
 
     if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
         await ctx.channel.send("No image file")
