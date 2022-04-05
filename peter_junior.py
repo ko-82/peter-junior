@@ -17,7 +17,6 @@ from nextcord.ext.commands.flags import convert_flag
 from nextcord import user
 from nextcord.ext import commands
 
-from playwright.async_api import async_playwright
 from pyppeteer import launch
 
 
@@ -41,23 +40,13 @@ def get_leaderboard(track:str) -> pj_leaderboard.Leaderboard:
     leaderboard.track = track
     return leaderboard
 
-async def html_screenshot(html_path, html_dir_path):
-    html_path_abs = path.abspath(html_path).replace("\\","/")
-    html_url = urllib.parse.quote(html_path_abs, safe=":/")
-    img_path = path.join(html_dir_path, "table.png")
-    async with async_playwright() as p:
-        browser = await p.chromium.launch()
-        page = await browser.new_page()
-        response = await page.goto(f"file:///{html_url}")
-        await page.locator(".ldb-table").screenshot(path=img_path)
-        await browser.close()
-
 async def pyp_html_screenshot(html_path, html_dir_path):
     html_path_abs = path.abspath(html_path).replace("\\","/")
     html_url = urllib.parse.quote(html_path_abs, safe=":/")
     img_path = path.join(html_dir_path, "table.png")
 
-    browser = await launch()
+    browser = await launch({"executablePath": "/usr/bin/chromium-browser"})
+    print("Browser launched...")
     page = await browser.newPage()
     await page.setViewport({"width": 1280, "height": 720})
     response = await page.goto(f"file:///{html_url}")
@@ -150,26 +139,15 @@ async def print_leaderboard_short(ctx, track):
 
     await ctx.channel.send(embed=embed)
 
+
 @bot.command(name="genscr")
 @commands.has_role('Admin')
 async def generate_screenshot(ctx, track):
     leaderboard = get_leaderboard(track=track)
     leaderboard.to_html()
-    await html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
-
-    if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
-        await ctx.channel.send("No image file")
-    else:
-        with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
-            image = nextcord.File(f)
-            await ctx.channel.send(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
-
-@bot.command(name="pypgenscr")
-@commands.has_role('Admin')
-async def generate_screenshot(ctx, track):
-    leaderboard = get_leaderboard(track=track)
-    leaderboard.to_html()
+    print("HTML done")
     await pyp_html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
+    print("Screenshot taken")
 
     if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
         await ctx.channel.send("No image file")
@@ -177,6 +155,7 @@ async def generate_screenshot(ctx, track):
         with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
             image = nextcord.File(f)
             await ctx.channel.send(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
+    print("Done")
 
 @bot.command(name="db_timestamp")
 async def db_timestamp(ctx):

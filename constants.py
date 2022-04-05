@@ -414,5 +414,6 @@ session_exclude = {
     "Spa": [],
     "Suzuka": [],
     "Oulton Park": [],
-    "Monza": []
+    "Monza": [],
+    "Paul Ricard": []
 }

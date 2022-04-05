@@ -226,7 +226,7 @@ class Leaderboard:
         """
         entry_list = []
         last_updated_str = ""
-        with open(file_path, "r") as csv_file:
+        with open(file_path, "r", encoding='latin-1') as csv_file:
             line_count = 0
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
