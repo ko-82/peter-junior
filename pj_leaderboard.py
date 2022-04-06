@@ -389,7 +389,7 @@ class Leaderboard:
             for row in rows:
                 filename = row['data-href'].split('/')[2]
                 #track_excludes = constants.session_exclude[self.track]
-                if (filename in constants.session_exclude[self.track]):
+                if ((self.track in constants.session_exclude) and (filename in constants.session_exclude[self.track])):
                     print(f"DB: Excluded session || {Session.session_res_prefix}{filename}")
                     continue
                 session_res_url = f"{Session.session_res_prefix}{filename}"
@@ -433,7 +433,12 @@ class Leaderboard:
                         if not found_flag:
                             self.entry_list.append(session_entry)
                 else:
-                    print(f"DB: Track doesn't match || {Session.session_res_prefix}{filename}")
+                    if (track != self.track):
+                        print(f"DB: Track doesn't match || {Session.session_res_prefix}{filename}")
+                    elif (timestamp <= self.last_updated):
+                        print(f"DB: Old session || {Session.session_res_prefix}{filename}")
+                    else:
+                        print(f"DB: Unknown error || {Session.session_res_prefix}{filename}")
             print(f"=====Finished page{page+1}=====")
         self.entry_list.sort(key=lambda x: x.best_time.total_seconds())
         self.last_updated = datetime.datetime.now(datetime.timezone.utc)
