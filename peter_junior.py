@@ -10,6 +10,7 @@ import math
 import argparse
 import urllib.parse
 from os import path
+import platform
 
 import nextcord
 from nextcord.ext.commands import context
@@ -45,7 +46,10 @@ async def pyp_html_screenshot(html_path, html_dir_path):
     html_url = urllib.parse.quote(html_path_abs, safe=":/")
     img_path = path.join(html_dir_path, "table.png")
 
-    browser = await launch({"executablePath": "/usr/bin/chromium-browser"})
+    if ("arm" in platform.machine()):
+        browser = await launch({"executablePath": "/usr/bin/chromium-browser"})     #Pyppeteer uses x86 Chromium on ARM for some unholy reason
+    else:
+        browser = await launch()
     print("Browser launched...")
     page = await browser.newPage()
     await page.setViewport({"width": 1280, "height": 720})
@@ -162,5 +166,72 @@ async def db_timestamp(ctx):
     now = datetime.now(timezone.utc)
     timestamp = now.timestamp()
     await ctx.channel.send(f"<t:{int(timestamp)}:F>")
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID])
+async def choose_a_number(
+    interaction: nextcord.Interaction,
+    number: str = nextcord.SlashOption(name="settings", description="Configure Your Settings")
+):
+    await interaction.response.send_message(f"You chose {number}")
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="fuel")
+async def fuel_slash(
+    interaction: nextcord.Interaction,
+    total_time: int = nextcord.SlashOption(name="total_time", description="Total race time"),
+    lap_time: str = nextcord.SlashOption(name="lap_time", description="Average lap time in mm:ss.SSS format"),
+    fuel_per_lap: float = nextcord.SlashOption(name="fuel_per_lap", description="Fuel consumed per lap")
+):
+    total_fuel = calc_fuel(total_time, lap_time, fuel_per_lap)
+    await interaction.response.send_message(
+        (
+            f"Total {total_time} minutes\n"
+            f"{lap_time} per lap\n"
+            f"{fuel_per_lap}L per lap\n"
+            f"Fuel needed: {total_fuel.min}L\n"
+            f"Fuel needed with full formation lap: {total_fuel.fm}L\n"
+        )
+    )
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="update_leaderboard")
+async def updateldb_slash(
+    interaction: nextcord.Interaction,
+    track: str = nextcord.SlashOption(name="track", description="Track to update"),
+    pages: int = nextcord.SlashOption(name="pages", description="Number of pages to scrape"),
+    pw: bool = nextcord.SlashOption(name="pw", description="Limit to password protected sessions. Set to true unless you're Peter and you're messing around")
+):
+    #TODO: Figure out how to call bot.updateldb() from here
+    leaderboard = get_leaderboard(track=track)
+    leaderboard.update(pages=pages, pw=pw)
+    await interaction.response.send_message(f"Updated {pages} of {track} with password {pw}")
+    leaderboard.write_leaderboard(path.join("csvs", f"{leaderboard.track}.csv"))
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="print_leaderboard")
+async def print_leaderboard_slash(
+    interaction: nextcord.Interaction,
+    track: str = nextcord.SlashOption(name="track", description="Track to print the leaderboard for"),
+):
+    leaderboard = get_leaderboard(track=track)
+    leaderboard.write_leaderboard(file_path=path.join("print", f"{leaderboard.track}.txt"), suppress_id=True, space_delim=True, trail_trim=True)
+    await interaction.response.send_message(file=nextcord.File(fp=path.join("print", f"{leaderboard.track}.txt")))
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="generate_screenshot")
+async def generate_screenshot_slash(
+    interaction: nextcord.Interaction,
+    track: str = nextcord.SlashOption(name="track", description="Track to print the leaderboard for"),
+):
+    leaderboard = get_leaderboard(track=track)
+    leaderboard.to_html()
+    print("HTML done")
+    await pyp_html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
+    print("Screenshot taken")
+
+    if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
+        await interaction.response.send_message("No image file")
+    else:
+        with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
+            image = nextcord.File(f)
+            await interaction.response.send_message(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
+    print("Done")
+
 
 bot.run(keys.BOT_TOKEN)
