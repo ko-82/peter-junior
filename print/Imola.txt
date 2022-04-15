@@ -1,28 +1,50 @@
- Rank             Driver                         Car                   Lap Time       Sector 1       Sector 2       Sector 3   
-  1   Chris Moses (MAD)            Aston Martin Vantage V8 2019       01:42.277      00:22.027      00:32.950      00:47.300   
-  2   Douglas Mitchell (DJM)       BMW M4 GT3 2022                    01:42.952      00:22.012      00:32.840      00:48.100   
-  3   Michael Moening (MMO)        Aston Martin Vantage V8 2019       01:43.317      00:22.120      00:33.090      00:48.107   
-  4   Chris Stefiuk (STE)          Lamborghini Huracan Evo 2019       01:43.477      00:22.142      00:33.347      00:47.987   
-  5   Evan Kim (KIM)               Bentley Continental GT3 2018       01:43.630      00:22.277      00:33.300      00:48.052   
-  6   Russell Allen (ALL)          Nissan GT-R Nismo GT3 2018         01:43.672      00:22.512      00:33.147      00:48.012   
-  7   Taylor Carter (WTF)          McLaren 720S GT3 Special           01:43.935      00:22.192      00:33.105      00:48.637   
-  8   Dominic Duran (DCD)          McLaren 720S GT3 Special           01:43.957      00:22.297      00:33.165      00:48.495   
-  9   Justin Burrage (BUR)         Aston Martin Vantage V8 2019       01:44.020      00:22.170      00:33.575      00:48.275   
-  10  Curtis Lee (LEE)             Audi R8 LMS Evo 2019               01:44.552      00:22.635      00:33.365      00:48.552   
-  11  Dae Hee Yun (HYD)            Aston Martin Vantage V8 2019       01:45.112      00:22.587      00:34.042      00:48.482   
-  12  Matthew Schwartz (SCH)       McLaren 720S GT3 Special           01:45.457      00:22.577      00:33.750      00:49.130   
-  13  Hesham Rimzk (RIM)           Ferrari 488 GT3 Evo                01:45.802      00:22.722      00:34.275      00:48.805   
-  14  Dustin Fickert (DRF)         McLaren 720S GT3 Special           01:46.002      00:22.947      00:34.065      00:48.990   
-  15  Josh Damiani (DAM)           Aston Martin Vantage V8 2019       01:46.107      00:22.370      00:33.737      00:50.000   
-  16  Mathieu Beaudin (MBB)        Lamborghini Huracan Evo 2019       01:46.410      00:22.785      00:34.187      00:49.437   
-  17  Victor Diaz (PLY)            McLaren 720S GT3 Special           01:46.457      00:22.740      00:34.460      00:49.257   
-  18  Kyle Martin (PLY)            Porsche 991 II GT3 R 2019          01:46.757      00:23.407      00:34.062      00:49.287   
-  19  Kyle  Turner (PLY)           McLaren 720S GT3 Special           01:47.152      00:22.962      00:34.410      00:49.780   
-  20  Eduardo Rodr�guez (RDZ)    Aston Martin Vantage V8 2019       01:48.265      00:23.205      00:34.610      00:50.450   
-  21  Dan Meyer (PLY)              Ferrari 488 GT3 Evo                01:48.440      00:23.302      00:34.282      00:50.855   
-  22  Jacob Wolfman (WOL)          Bentley Continental GT3 2018       01:51.867      00:24.142      00:36.592      00:51.132   
-  23  Dustin Fickert (DRF)         Aston Martin Vantage V8 2019       02:04.690      00:23.530      00:46.800      00:54.360   
-  24  colin shea (PLY)             Ferrari 488 GT3 Evo                59:59.999      00:00.000      00:00.000      00:00.000   
-  25  Will Forsling (WMF)          BMW M4 GT3 2022                    59:59.999      00:00.000      00:00.000      00:00.000   
-  26  Dustin Fickert (DRF)         BMW M4 GT3 2022                    59:59.999      00:00.000      00:00.000      00:00.000   
-Last updated?2022-02-10T20:00:10+0000
+ Rank              Driver                           Car                   Lap Time       Sector 1       Sector 2       Sector 3   
+  1   Ian Kreiger (KRE)               Aston Martin Vantage V8 2019       01:42.102      00:21.957      00:32.892      00:47.252   
+  2   Robert Arendac (ARE)            Mercedes AMG GT3 2020              01:42.202      00:21.965      00:32.850      00:47.387   
+  3   Chris Moses (MAD)               Aston Martin Vantage V8 2019       01:42.277      00:22.027      00:32.950      00:47.300   
+  4   Steve Yoon (HGN)                Aston Martin Vantage V8 2019       01:42.277      00:21.745      00:33.015      00:47.517   
+  5   Chris Moses (MAD)               BMW M4 GT3 2022                    01:42.297      00:22.112      00:32.635      00:47.550   
+  6   Chris Moses (MAD)               Mercedes AMG GT3 2020              01:42.322      00:21.950      00:32.842      00:47.530   
+  7   Chris Moses (MAD)               Nissan GT-R Nismo GT3 2018         01:42.402      00:22.195      00:32.945      00:47.262   
+  8   Tyler James (TYJ)               BMW M4 GT3 2022                    01:42.465      00:21.885      00:32.997      00:47.582   
+  9   Dominic Duran (DCD)             McLaren 720S GT3 Special           01:42.632      00:22.127      00:32.802      00:47.702   
+  10  Taylor Carter (WTF)             McLaren 720S GT3 Special           01:42.735      00:22.257      00:32.730      00:47.747   
+  11  Travis Robinson (TBR)           Lamborghini Huracan Evo 2019       01:42.827      00:22.145      00:32.830      00:47.852   
+  12  Douglas Mitchell (DJM)          BMW M4 GT3 2022                    01:42.952      00:22.012      00:32.840      00:48.100   
+  13  Evan Kim (KIM)                  Bentley Continental GT3 2018       01:43.052      00:22.127      00:33.170      00:47.755   
+  14  J. Taka (TAK)                   BMW M4 GT3 2022                    01:43.070      00:22.170      00:33.177      00:47.722   
+  15  Damon Morla (DAM)               BMW M4 GT3 2022                    01:43.252      00:22.265      00:32.877      00:48.110   
+  16  Michael Moening (MMO)           Aston Martin Vantage V8 2019       01:43.317      00:22.120      00:33.090      00:48.107   
+  17  Chris Stefiuk (STE)             Lamborghini Huracan Evo 2019       01:43.477      00:22.142      00:33.347      00:47.987   
+  18  Matthew Schwartz (SCH)          McLaren 720S GT3 Special           01:43.535      00:22.255      00:33.052      00:48.227   
+  19  Russell Allen (ALL)             Nissan GT-R Nismo GT3 2018         01:43.672      00:22.512      00:33.147      00:48.012   
+  20  Dae Hee Yun (HYD)               McLaren 720S GT3 Special           01:43.680      00:22.227      00:33.205      00:48.247   
+  21  Dustin Fickert (DRF)            McLaren 720S GT3 Special           01:43.990      00:22.500      00:33.220      00:48.270   
+  22  Justin Burrage (BUR)            Aston Martin Vantage V8 2019       01:44.020      00:22.170      00:33.575      00:48.275   
+  23  Victor Diaz (PLY)               McLaren 720S GT3 Special           01:44.030      00:22.357      00:33.315      00:48.357   
+  24  Josh Damiani (DAM)              Aston Martin Vantage V8 2019       01:44.042      00:22.190      00:33.767      00:48.085   
+  25  Curtis Lee (LEE)                Audi R8 LMS Evo 2019               01:44.277      00:22.437      00:33.287      00:48.552   
+  26  Scott Speed (LIN)               Ferrari 488 GT3 Evo                01:44.315      00:22.322      00:33.475      00:48.517   
+  27  Chris Hannigan (HAN)            Bentley Continental GT3 2018       01:44.327      00:22.352      00:33.257      00:48.717   
+  28  Tommy Dong (TDO)                Lexus RC F GT3                     01:44.477      00:22.020      00:33.522      00:48.935   
+  29  Nathan Schaefer (LFG)           McLaren 720S GT3 Special           01:44.480      00:22.522      00:33.647      00:48.310   
+  30  Kyle  Turner (PLY)              McLaren 720S GT3 Special           01:44.495      00:22.342      00:33.275      00:48.877   
+  31  colin shea (PLY)                Ferrari 488 GT3 Evo                01:44.515      00:22.310      00:33.560      00:48.645   
+  32  John Foguth (JFO)               McLaren 720S GT3 Special           01:44.522      00:22.270      00:33.417      00:48.835   
+  33  Matt Morrison (MOR)             Audi R8 LMS Evo 2019               01:44.812      00:22.695      00:33.465      00:48.652   
+  34  Thomas Greer (TGR)              Audi R8 LMS Evo II 2022            01:45.000      00:22.427      00:33.620      00:48.952   
+  35  Dae Hee Yun (HYD)               Aston Martin Vantage V8 2019       01:45.112      00:22.587      00:34.042      00:48.482   
+  36  Dustin Fickert (DRF)            Aston Martin Vantage V8 2019       01:45.245      00:22.725      00:33.670      00:48.850   
+  37  Mathieu Beaudin (MBB)           McLaren 720S GT3 Special           01:45.245      00:22.745      00:33.452      00:49.047   
+  38  Ethan Hoskin (E)                McLaren 720S GT3 Special           01:45.422      00:22.725      00:33.802      00:48.895   
+  39  Hesham Rimzk (RIM)              Ferrari 488 GT3 Evo                01:45.802      00:22.722      00:34.275      00:48.805   
+  40  Eduardo RodrÃ¯Â¿Â½guez (RDZ)    Aston Martin Vantage V8 2019       01:46.232      00:22.665      00:34.225      00:49.342   
+  41  Mathieu Beaudin (MBB)           Lamborghini Huracan Evo 2019       01:46.410      00:22.785      00:34.187      00:49.437   
+  42  Kyle Martin (PLY)               Porsche 991 II GT3 R 2019          01:46.757      00:23.407      00:34.062      00:49.287   
+  43  Jacob Wolfman (WOL)             Bentley Continental GT3 2018       01:46.942      00:22.967      00:34.907      00:49.067   
+  44  Dan Meyer (PLY)                 Ferrari 488 GT3 Evo                01:48.270      00:23.327      00:34.675      00:50.267   
+  45  Gavin Thomas (THO)              McLaren 720S GT3 Special           01:49.295      00:23.320      00:35.115      00:50.860   
+  46  Will Forsling (WMF)             BMW M4 GT3 2022                    59:59.999      00:00.000      00:00.000      00:00.000   
+  47  Dustin Fickert (DRF)            BMW M4 GT3 2022                    59:59.999      00:00.000      00:00.000      00:00.000   
+  48  Mathieu Beaudin (MBB)           BMW M4 GT3 2022                    59:59.999      00:00.000      00:00.000      00:00.000   
+Last updated?2022-04-15T04:00:38+0000

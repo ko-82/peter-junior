@@ -1,0 +1,54 @@
+ Rank               Driver                            Car                   Lap Time       Sector 1       Sector 2       Sector 3   
+  1   Matt Leeman (LEE)                 McLaren 720S GT3 Special           01:33.000      00:23.272      00:36.947      00:32.780   
+  2   S Yoon (HGN)                      Aston Martin Vantage V8 2019       01:33.997      00:23.475      00:37.340      00:33.182   
+  3   Patrick Rust (RUS)                Porsche 991 II GT3 R 2019          01:34.157      00:23.587      00:37.615      00:32.955   
+  4   Grant Klinsing (KLI)              Audi R8 LMS Evo II 2022            01:34.400      00:23.752      00:37.385      00:33.262   
+  5   Dominic Duran (DCD)               Porsche 991 II GT3 R 2019          01:34.552      00:23.550      00:37.560      00:33.442   
+  6   Tyler James (Tyler James)         BMW M4 GT3 2022                    01:34.560      00:23.692      00:37.510      00:33.357   
+  7   Brooker Quigg (BCQ)               Aston Martin Vantage V8 2019       01:34.722      00:23.627      00:37.692      00:33.402   
+  8   Max  Sanchez (MAX)                BMW M4 GT3 2022                    01:34.815      00:23.697      00:37.530      00:33.587   
+  9   Douglas Mitchell (DJM)            BMW M4 GT3 2022                    01:35.165      00:23.842      00:37.682      00:33.640   
+  10  Dae Hee Yun (HYD)                 Aston Martin Vantage V8 2019       01:35.237      00:23.870      00:37.697      00:33.670   
+  11  Justin Burrage (BUR)              Porsche 991 II GT3 R 2019          01:35.395      00:23.847      00:37.952      00:33.595   
+  12  Evan Kim (KIM)                    Bentley Continental GT3 2018       01:35.417      00:23.962      00:37.845      00:33.610   
+  13  Matthew Schwartz (MLS)            Lexus RC F GT3                     01:35.637      00:24.020      00:37.890      00:33.727   
+  14  Colin Shea (COLIN )               McLaren 720S GT3 Special           01:35.717      00:24.065      00:37.705      00:33.947   
+  15  Colin Matyac (PLY)                Audi R8 LMS Evo II 2022            01:35.995      00:24.062      00:37.887      00:34.045   
+  16  Brad Merys (BRAD)                 Lamborghini Huracan Evo 2019       01:36.002      00:24.130      00:38.032      00:33.840   
+  17  Victor Diaz (DIA)                 McLaren 720S GT3 Special           01:36.130      00:24.000      00:38.167      00:33.962   
+  18  Bradley Busek (BSK)               BMW M4 GT3 2022                    01:36.170      00:24.302      00:38.005      00:33.862   
+  19  Thomas Greer (TGR)                Audi R8 LMS Evo II 2022            01:36.277      00:24.360      00:37.952      00:33.965   
+  20  Jess Osborn (JESS)                BMW M4 GT3 2022                    01:36.377      00:24.320      00:37.982      00:34.075   
+  21  Joshua Arnold (JARNOLD)           Audi R8 LMS Evo II 2022            01:36.417      00:24.215      00:38.150      00:34.052   
+  22  Matt Morrison (MFM)               Audi R8 LMS Evo II 2022            01:36.475      00:24.380      00:37.975      00:34.120   
+  23  Thomas Greer (TGR)                McLaren 720S GT3 Special           01:36.510      00:24.495      00:38.075      00:33.940   
+  24  Diego Moro (MOR)                  Audi R8 LMS Evo II 2022            01:36.555      00:24.430      00:38.002      00:34.122   
+  25  Toma Constantin (TCN)             Ferrari 488 GT3 Evo                01:36.605      00:23.915      00:38.702      00:33.987   
+  26  Dustin Fickert (DRF)              Bentley Continental GT3 2018       01:36.732      00:24.185      00:38.390      00:34.157   
+  27  Curtis Lee (CUJO)                 Audi R8 LMS Evo II 2022            01:36.805      00:24.367      00:38.265      00:34.172   
+  28  Kyle Turner (KYLE)                McLaren 720S GT3 Special           01:36.935      00:24.275      00:38.315      00:34.345   
+  29  David  Taflevich  (DAVE )         BMW M4 GT3 2022                    01:36.962      00:24.507      00:38.272      00:34.182   
+  30  Mathieu Beaudin (MBB)             McLaren 720S GT3 Special           01:37.037      00:24.280      00:38.345      00:34.412   
+  31  Pauleh Hartman (PAL)              McLaren 720S GT3 Special           01:37.082      00:24.395      00:38.317      00:34.370   
+  32  Hesham Rimzk (RIMZK)              McLaren 720S GT3 Special           01:37.365      00:24.527      00:38.867      00:33.970   
+  33  Eduardo RodrÃÂÃÂ­guez (RDZ)    Audi R8 LMS Evo II 2022            01:37.392      00:24.087      00:38.682      00:34.622   
+  34  Alex Daniel (ALEX )               BMW M4 GT3 2022                    01:37.397      00:24.450      00:38.730      00:34.217   
+  35  Curtis Lee (CUJO)                 Lexus RC F GT3                     01:37.427      00:24.627      00:38.682      00:34.117   
+  36  Gavin Thomas (GAVIN)              Bentley Continental GT3 2018       01:37.502      00:24.685      00:38.680      00:34.137   
+  37  Samuel Varghese (STV)             BMW M4 GT3 2022                    01:38.165      00:24.750      00:38.832      00:34.582   
+  38  Tyrell Foster (PLY)               Porsche 991 II GT3 R 2019          01:38.177      00:24.715      00:39.110      00:34.352   
+  39  Geetesh Khatavkar (KHA)           Audi R8 LMS Evo II 2022            01:38.382      00:24.632      00:38.810      00:34.940   
+  40  Curtis Lee (CUJO)                 Audi R8 LMS Evo 2019               01:38.397      00:24.562      00:39.195      00:34.640   
+  41  Kyle Martin (KYLE)                Mercedes AMG GT3 2020              01:38.652      00:24.612      00:39.235      00:34.805   
+  42  Jacob Wolfman (WOLFDOG)           Bentley Continental GT3 2018       01:39.127      00:25.180      00:39.327      00:34.620   
+  43  Jacob Rogers (ROG)                BMW M4 GT3 2022                    01:39.465      00:24.870      00:39.465      00:35.130   
+  44  Dan Meyer (MEY)                   Audi R8 LMS Evo II 2022            01:39.877      00:24.975      00:39.522      00:35.380   
+  45  Farzam Farhoumand (FFX)           BMW M4 GT3 2022                    01:40.042      00:25.420      00:39.310      00:35.312   
+  46  Farzam Farhoumand (FFX)           Porsche 991 II GT3 Cup             01:44.230      00:27.125      00:40.812      00:36.292   
+  47  Steve Yoon (HGN)                  Bentley Continental GT3 2018       59:59.999      00:00.000      00:00.000      00:00.000   
+  48  Jacob Rogers (ROG)                Lamborghini Huracan Evo 2019       59:59.999      00:00.000      00:00.000      00:00.000   
+  49  Farzam Farhoumand (FFX)           Porsche 991 II GT3 R 2019          59:59.999      00:00.000      00:00.000      00:00.000   
+  50  perry isackson (PLY)              1996 Toyota Corolla                59:59.999      00:00.000      00:00.000      00:00.000   
+  51  perry isackson (PLY)              Porsche 991 II GT3 Cup             59:59.999      00:00.000      00:00.000      00:00.000   
+  52  perry isackson (PLY)              BMW M4 GT3 2022                    59:59.999      00:00.000      00:00.000      00:00.000   
+Last updated?2022-04-09T04:16:00+0000

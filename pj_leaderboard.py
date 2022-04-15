@@ -397,7 +397,7 @@ class Leaderboard:
                 if (
                     pw and
                     ("Password: sra" not in session_res_html) and 
-                    ("SRA League Race" not in session_res_html)
+                    ("SRA League race" not in session_res_html)
                 ):
                     print(f"DB: No password || {Session.session_res_prefix}{filename}")
                     continue
