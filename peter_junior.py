@@ -200,11 +200,14 @@ async def updateldb_slash(
     pages: int = nextcord.SlashOption(name="pages", description="Number of pages to scrape"),
     pw: bool = nextcord.SlashOption(name="pw", description="Limit to password protected sessions. Set to true unless you're Peter and you're messing around")
 ):
-    #TODO: Figure out how to call bot.updateldb() from here
-    leaderboard = get_leaderboard(track=track)
-    leaderboard.update(pages=pages, pw=pw)
-    await interaction.response.send_message(f"Updated {pages} of {track} with password {pw}")
-    leaderboard.write_leaderboard(path.join("csvs", f"{leaderboard.track}.csv"))
+    if not (interaction.user.get_role(constants.SRA_ADMIN_ROLE_ID) or interaction.user.get_role(constants.SRA_TECH_ROLE_ID)):
+        await interaction.response.send_message("You're not authorized to use this command")
+    else:
+        #TODO: Figure out how to call bot.updateldb() from here
+        leaderboard = get_leaderboard(track=track)
+        leaderboard.update(pages=pages, pw=pw)
+        await interaction.response.send_message(f"Updated {pages} of {track} with password {pw}")
+        leaderboard.write_leaderboard(path.join("csvs", f"{leaderboard.track}.csv"))
 
 @bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="print_leaderboard")
 async def print_leaderboard_slash(
@@ -220,20 +223,23 @@ async def generate_screenshot_slash(
     interaction: nextcord.Interaction,
     track: str = nextcord.SlashOption(name="track", description="Track to print the leaderboard for"),
 ):
-    await interaction.response.defer()
-    leaderboard = get_leaderboard(track=track)
-    leaderboard.to_html()
-    print("HTML done")
-    await pyp_html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
-    print("Screenshot taken")
-
-    if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
-        await interaction.followup.send("No image file")
+    if not (interaction.user.get_role(constants.SRA_ADMIN_ROLE_ID) or interaction.user.get_role(constants.SRA_TECH_ROLE_ID)):
+        await interaction.response.send_message("You're not authorized to use this command")
     else:
-        with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
-            image = nextcord.File(f)
-            await interaction.followup.send(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
-    print("Done")
+        await interaction.response.defer()
+        leaderboard = get_leaderboard(track=track)
+        leaderboard.to_html()
+        print("HTML done")
+        await pyp_html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
+        print("Screenshot taken")
+
+        if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
+            await interaction.followup.send("No image file")
+        else:
+            with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
+                image = nextcord.File(f)
+                await interaction.followup.send(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
+        print("Done")
 
 
 bot.run(keys.BOT_TOKEN)
