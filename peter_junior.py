@@ -57,7 +57,9 @@ async def pyp_html_screenshot(html_path, html_dir_path):
     response = await page.goto(f"file:///{html_url}")
     element = await page.querySelector(".ldb-table")
     await element.screenshot(path=img_path)
+    print("Scr taken...")
     await browser.close()
+    print("Browser closed...")
 
 @bot.event
 async def on_ready():
