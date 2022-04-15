@@ -47,6 +47,7 @@ async def pyp_html_screenshot(html_path, html_dir_path):
     img_path = path.join(html_dir_path, "table.png")
 
     if ("arm" in platform.machine()):
+        print("ARM")
         browser = await launch({"executablePath": "/usr/bin/chromium-browser"})     #Pyppeteer uses x86 Chromium on ARM for some unholy reason
     else:
         browser = await launch()
@@ -219,6 +220,7 @@ async def generate_screenshot_slash(
     interaction: nextcord.Interaction,
     track: str = nextcord.SlashOption(name="track", description="Track to print the leaderboard for"),
 ):
+    await interaction.response.defer()
     leaderboard = get_leaderboard(track=track)
     leaderboard.to_html()
     print("HTML done")
@@ -226,11 +228,11 @@ async def generate_screenshot_slash(
     print("Screenshot taken")
 
     if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
-        await interaction.response.send_message("No image file")
+        await interaction.followup.send("No image file")
     else:
         with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
             image = nextcord.File(f)
-            await interaction.response.send_message(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
+            await interaction.followup.send(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
     print("Done")
 
 
