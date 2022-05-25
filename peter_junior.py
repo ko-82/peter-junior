@@ -205,11 +205,13 @@ async def updateldb_slash(
     if not (interaction.user.get_role(constants.SRA_ADMIN_ROLE_ID) or interaction.user.get_role(constants.SRA_TECH_ROLE_ID)):
         await interaction.response.send_message("You're not authorized to use this command")
     else:
+        await interaction.response.defer()
         #TODO: Figure out how to call bot.updateldb() from here
         leaderboard = get_leaderboard(track=track)
         leaderboard.update(pages=pages, pw=pw)
-        await interaction.response.send_message(f"Updated {pages} of {track} with password {pw}")
         leaderboard.write_leaderboard(path.join("csvs", f"{leaderboard.track}.csv"))
+        await interaction.followup.send(f"Updated {pages} of {track} with password {pw}")
+        
 
 @bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="print_leaderboard")
 async def print_leaderboard_slash(
