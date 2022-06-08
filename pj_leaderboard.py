@@ -12,6 +12,7 @@ from dateutil import parser
 from os import path
 import pandas
 
+host_list = ["simracingalliance.emperorservers.com", "accsm.simracingalliance.com"]
 
 def laptimetostring(td: datetime.timedelta, trail_trim = False) -> str:
     """
@@ -101,12 +102,12 @@ class Session:
         filename: Filename of server results json, i.e 220210_232907_FP
         results: A list of Entries containing the results
     """
-    dash_url = f"https://simracingalliance.emperorservers.com/results"
-    session_res_prefix = f"https://simracingalliance.emperorservers.com/results/"
-    session_json_prefix = f"https://simracingalliance.emperorservers.com/results/download/"
-    simresults_prefix = f"https://simresults.net/remote/csv?result=https%3A%2F%2Fsimracingalliance.emperorservers.com%2Fresults%2Fdownload%2F"
+    #dash_url = f"https://simracingalliance.emperorservers.com/results"
+    #session_res_prefix = f"https://simracingalliance.emperorservers.com/results/"
+    #session_json_prefix = f"https://simracingalliance.emperorservers.com/results/download/"
+    #simresults_prefix = f"https://simresults.net/remote/csv?result=https%3A%2F%2Fsimracingalliance.emperorservers.com%2Fresults%2Fdownload%2F"
     
-    def __init__(self, filename:str = None) -> None:
+    def __init__(self, host:str = None, filename:str = None) -> None:
         """
         Initialize a Session
 
@@ -115,18 +116,21 @@ class Session:
         """
         self.filename = filename
         self.results:list[Entry] = []
+        self.dash_url = f"https://{host}/results"
+        self.session_res_prefix = f"{self.dash_url}/"
+        self.session_json_prefix = f"{self.dash_url}/download/"
 
     def get_session_results(self):
         """
         Fetch results of a session from Emperor servers and populate the Session instance with that result.
         Ignores sessions with no laps.
         """
-        session_json_url = f"{Session.session_json_prefix}{self.filename}.json"
+        session_json_url = f"{self.session_json_prefix}{self.filename}.json"
         session_json = requests.get(session_json_url, allow_redirects=True).content.decode("utf-8")
         session_json_data = json.loads(session_json)
         laps = session_json_data['laps']
         if not laps:
-            print(f"DB: NO LAPS || {Session.session_res_prefix}{self.filename}")
+            print(f"DB: NO LAPS || {self.session_res_prefix}{self.filename}")
             return
 
         # Leaderboard lines are cars that were in the session
@@ -381,65 +385,72 @@ class Leaderboard:
         # Session html for checking password restriction
         # Pass session filename to Session object and call get_session_results
         # Update leaderboard with Session object
-        for page in range(0, pages):
-            print(f"=====Processing page{page+1}=====")
-            dash_html = requests.get(f"{Session.dash_url}?page={page}", allow_redirects=True).content.decode("utf-8")
-            soup = bs4.BeautifulSoup(dash_html, "html.parser")
-            rows = soup.select(".row-link")
-            for row in rows:
-                filename = row['data-href'].split('/')[2]
-                #track_excludes = constants.session_exclude[self.track]
-                if ((self.track in constants.session_exclude) and (filename in constants.session_exclude[self.track])):
-                    print(f"DB: Excluded session || {Session.session_res_prefix}{filename}")
-                    continue
-                session_res_url = f"{Session.session_res_prefix}{filename}"
-                session_res_html = requests.get(session_res_url, allow_redirects=True).content.decode("utf-8")
-                if (
-                    pw and
-                    ("Password: sra" not in session_res_html) and 
-                    ("SRA League race" not in session_res_html)
-                ):
-                    print(f"DB: No password || {Session.session_res_prefix}{filename}")
-                    continue
-                print(f"Processing: {Session.session_res_prefix}{filename}")
-                children = row.contents
-                timestamp_str = children[1].contents[0].strip()
-                session_type = children[3]
-                track = children[5].contents[0].strip()
-                #timestamp = datetime.datetime.strptime(timestamp_str, "%a, %d %b %Y %H:%M:%S %Z")
-                timestamp = parser.parse(timestamp_str)
 
-                if ( (track == self.track) and (timestamp > self.last_updated) ):   #If track matches and new
-                    session = Session(filename)
-                    session.get_session_results()
-                    if not session.results:
+    
+        for host in host_list:
+            print(f"HOST: {host}")
+            dash_url = f"https://{host}/results"
+            session_res_prefix = f"{dash_url}/"
+            for page in range(0, pages):
+                print(f"=====Processing page{page+1}=====")
+                dash_html = requests.get(f"{dash_url}?page={page}", allow_redirects=True).content.decode("utf-8")
+                soup = bs4.BeautifulSoup(dash_html, "html.parser")
+                rows = soup.select(".row-link")
+                for row in rows:
+                    filename = row['data-href'].split('/')[2]
+                    #track_excludes = constants.session_exclude[self.track]
+                    if ((self.track in constants.session_exclude) and (filename in constants.session_exclude[self.track])):
+                        print(f"DB: Excluded session || {session_res_prefix}{filename}")
                         continue
-                    if not self.entry_list:
-                        self.entry_list = session.results
+                    session_res_url = f"{session_res_prefix}{filename}"
+                    session_res_html = requests.get(session_res_url, allow_redirects=True).content.decode("utf-8")
+                    if (
+                        pw and
+                        ("Password: sra" not in session_res_html) and 
+                        ("SRA League race" not in session_res_html)
+                    ):
+                        print(f"DB: No password || {session_res_prefix}{filename}")
                         continue
-                    for session_entry in session.results:
-                        found_flag = False
-                        for leaderboard_entry in self.entry_list:
-                            # If car and ID match
-                            if ( (leaderboard_entry.id == session_entry.id) and (leaderboard_entry.car == session_entry.car) ):
-                                found_flag = True
-                                if (leaderboard_entry.best_time > session_entry.best_time):
-                                    leaderboard_entry.best_time = session_entry.best_time
-                                    leaderboard_entry.s1 = session_entry.s1
-                                    leaderboard_entry.s2 = session_entry.s2
-                                    leaderboard_entry.s3 = session_entry.s3
-                        
-                        #If session entry is not in leaderboard entry
-                        if not found_flag:
-                            self.entry_list.append(session_entry)
-                else:
-                    if (track != self.track):
-                        print(f"DB: Track doesn't match || {Session.session_res_prefix}{filename}")
-                    elif (timestamp <= self.last_updated):
-                        print(f"DB: Old session || {Session.session_res_prefix}{filename}")
+                    print(f"Processing: {session_res_prefix}{filename}")
+                    children = row.contents
+                    timestamp_str = children[1].contents[0].strip()
+                    session_type = children[3]
+                    track = children[5].contents[0].strip()
+                    #timestamp = datetime.datetime.strptime(timestamp_str, "%a, %d %b %Y %H:%M:%S %Z")
+                    timestamp = parser.parse(timestamp_str)
+
+                    if ( (track == self.track) and (timestamp > self.last_updated) ):   #If track matches and new
+                        session = Session(host, filename)
+                        session.get_session_results()
+                        if not session.results:
+                            continue
+                        if not self.entry_list:
+                            self.entry_list = session.results
+                            continue
+                        for session_entry in session.results:
+                            found_flag = False
+                            for leaderboard_entry in self.entry_list:
+                                # If car and ID match
+                                if ( (leaderboard_entry.id == session_entry.id) and (leaderboard_entry.car == session_entry.car) ):
+                                    found_flag = True
+                                    if (leaderboard_entry.best_time > session_entry.best_time):
+                                        leaderboard_entry.best_time = session_entry.best_time
+                                        leaderboard_entry.s1 = session_entry.s1
+                                        leaderboard_entry.s2 = session_entry.s2
+                                        leaderboard_entry.s3 = session_entry.s3
+                            
+                            #If session entry is not in leaderboard entry
+                            if not found_flag:
+                                self.entry_list.append(session_entry)
                     else:
-                        print(f"DB: Unknown error || {Session.session_res_prefix}{filename}")
-            print(f"=====Finished page{page+1}=====")
+                        if (track != self.track):
+                            print(f"DB: Track doesn't match || {session_res_prefix}{filename}")
+                        elif (timestamp <= self.last_updated):
+                            print(f"DB: Old session || {session_res_prefix}{filename}")
+                        else:
+                            print(f"DB: Unknown error || {session_res_prefix}{filename}")
+                print(f"=====Finished page{page+1}=====")
+            print("#######################################################")
         self.entry_list.sort(key=lambda x: x.best_time.total_seconds())
         self.last_updated = datetime.datetime.now(datetime.timezone.utc)
         return
@@ -471,11 +482,11 @@ class Leaderboard:
 
 def main():
 
-    leaderboard = Leaderboard.read_leaderboard(path.join("csvs", "Brands Hatch.csv"))
-    leaderboard.track = "Silverstone"
-    leaderboard.update(pages=1)
+    leaderboard = Leaderboard.read_leaderboard(path.join("csvs", "Zolder.csv"))
+    leaderboard.track = "Zolder"
+    #leaderboard.update(pages=5)
     #leaderboard.update()
-    #leaderboard.write_leaderboard(file_path=path.join("ready", f"{leaderboard.track}.txt"), suppress_id=True, space_delim=True, trail_trim=True)
+    #leaderboard.write_leaderboard(file_path=path.join("csvs", f"{leaderboard.track}.csv"))
     #embed = leaderboard.generate_embed_compatible()
     #print(embed.driver)
     #print(embed.car)
