@@ -50,7 +50,7 @@ async def pyp_html_screenshot(html_path, html_dir_path):
         print("ARM")
         browser = await launch({"executablePath": "/usr/bin/chromium-browser"})     #Pyppeteer uses x86 Chromium on ARM for some unholy reason
     else:
-        browser = await launch()
+        browser = await launch(options={'args': ['--no-sandbox']})
     print("Browser launched...")
     page = await browser.newPage()
     await page.setViewport({"width": 1280, "height": 720})
