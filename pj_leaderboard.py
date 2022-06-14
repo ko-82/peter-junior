@@ -68,9 +68,13 @@ class Entry:
             s3: Best lap S3
         """
         self.name = name
+        self.first_name = ""
+        self.last_name = ""
+        self.short_name = ""
         #self.abbr = re.match(r".*\((.+)\)", name).group(1)
         self.id = id
         self.car = car
+        self.car_raw = 0
         self.best_time = best_time
         self.s1 = s1
         self.s2 = s2
@@ -119,6 +123,8 @@ class Session:
         self.dash_url = f"https://{host}/results"
         self.session_res_prefix = f"{self.dash_url}/"
         self.session_json_prefix = f"{self.dash_url}/download/"
+        self.track = ""
+        self.iswet = 0
 
     def get_session_results(self):
         """
@@ -128,6 +134,8 @@ class Session:
         session_json_url = f"{self.session_json_prefix}{self.filename}.json"
         session_json = requests.get(session_json_url, allow_redirects=True).content.decode("utf-8")
         session_json_data = json.loads(session_json)
+        self.track = session_json_data['trackName']
+        self.iswet = session_json_data['sessionResult']['isWetSession']
         laps = session_json_data['laps']
         if not laps:
             print(f"DB: NO LAPS || {self.session_res_prefix}{self.filename}")
@@ -144,6 +152,7 @@ class Session:
             for driver in drivers:
                 entry = Entry()
                 car_model = car['carModel']
+                entry.car_raw = car_model
                 car_id = car['carId']
                 if car_model in constants.car_model_dict:
                     entry.car = constants.car_model_dict[car_model]
@@ -152,6 +161,9 @@ class Session:
                 
                 driver_name = f"{driver['firstName']} {driver['lastName']} ({driver['shortName']})"
                 entry.name = driver_name
+                entry.first_name = driver['firstName']
+                entry.last_name = driver['lastName']
+                entry.short_name = driver['shortName']
                 
                 entry.id = driver['playerId']
                 
@@ -159,8 +171,10 @@ class Session:
                 min_lap_s1 = 0
                 min_lap_s2 = 0
                 min_lap_s3 = 0
+                valid_lap_set = False
                 for lap in laps:
                     if ( (lap['isValidForBest']) and (car_id == lap['carId']) and (driver_index == lap['driverIndex']) ):
+                        valid_lap_set = True
                         if (lap['laptime'] <= min_lap):
                             min_lap_s1 = lap['splits'][0]
                             min_lap_s2 = lap['splits'][1]
@@ -171,7 +185,8 @@ class Session:
                 entry.s2 = datetime.timedelta(milliseconds=min_lap_s2)
                 entry.s3 = datetime.timedelta(milliseconds=min_lap_s3)
                 
-                self.results.append(entry)
+                if valid_lap_set:
+                    self.results.append(entry)
                 driver_index += 1
 
     def __str__(self, suppress_id:bool = False) -> str:
@@ -188,6 +203,37 @@ class Session:
         for entry in self.results:
             results_str += f"{entry.__str__(suppress_id=suppress_id)}"
         return results_str
+
+    def to_post_json(self):
+        track_dict = {
+            "name" : self.track,
+            "is_wet": self.iswet
+        }
+        drivers_list = []
+        results_sorted = sorted(self.results, key=lambda e:e.best_time)
+        rank = 1
+        for entry in results_sorted:
+            entry_dict = {
+                "rank" : rank,
+                "first_name" : entry.first_name,
+                "last_name" : entry.last_name,
+                "short_name" : entry.short_name,
+                "steam_id" : entry.id,
+                "car_id" : entry.car_raw,
+                "lap_time" : entry.best_time.seconds*1000+entry.best_time.microseconds//1000,
+                "sector_1" : entry.s1.seconds*1000+entry.s1.microseconds//1000,
+                "sector_2" : entry.s2.seconds*1000+entry.s2.microseconds//1000,
+                "sector_3" : entry.s3.seconds*1000+entry.s3.microseconds//1000,
+            }
+            drivers_list.append(entry_dict)
+            rank += 1
+        js = {
+            "track" : track_dict,
+            "drivers" : drivers_list
+        }
+
+        return js
+
 
 
 class Leaderboard:
@@ -230,7 +276,7 @@ class Leaderboard:
         """
         entry_list = []
         last_updated_str = ""
-        with open(file_path, "r", encoding='latin-1') as csv_file:
+        with open(file_path, "r", encoding='utf-8') as csv_file:
             line_count = 0
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
@@ -290,7 +336,7 @@ class Leaderboard:
         """
         if not file_path:
             file_path = self.file_path
-        with open(file_path, "w") as file:
+        with open(file_path, "w", encoding="utf-8") as file:
             file.write(self.__str__(suppress_id=suppress_id, space_delim=space_delim, include_timestamp=include_timestamp, trail_trim=trail_trim))
 
     def __str__(self, suppress_id = False, space_delim = False, short = False, include_timestamp = True, trail_trim = False) -> str:
@@ -472,7 +518,7 @@ class Leaderboard:
             with open(css_path, "w") as css_file:
                 css_file.write(constants.css_string)
         self.write_leaderboard(file_path=html_csv_path, suppress_id=suppress_id, include_timestamp=include_timestamp, trail_trim=trail_trim)
-        pandas_csv = pandas.read_csv(html_csv_path, encoding='latin1')
+        pandas_csv = pandas.read_csv(html_csv_path, encoding='utf-8')
         pandas_html = pandas_csv.to_html(None, index=False, justify='center', classes="ldb-table")
         with open(html_path, "w", encoding="utf-8") as html_file:
             html_file.write(constants.html_string.format(ldb_html=pandas_html))
@@ -482,11 +528,11 @@ class Leaderboard:
 
 def main():
 
-    leaderboard = Leaderboard.read_leaderboard(path.join("csvs", "Zolder.csv"))
+    leaderboard = Leaderboard.read_leaderboard(path.join("csvs", "Zolder_posttest.csv"))
     leaderboard.track = "Zolder"
-    #leaderboard.update(pages=5)
+    leaderboard.update(pages=1, pw=False)
     #leaderboard.update()
-    #leaderboard.write_leaderboard(file_path=path.join("csvs", f"{leaderboard.track}.csv"))
+    leaderboard.write_leaderboard(file_path=path.join("csvs", "Zolder_posttest.csv"))
     #embed = leaderboard.generate_embed_compatible()
     #print(embed.driver)
     #print(embed.car)
