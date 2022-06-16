@@ -1,3 +1,7 @@
+from datetime import datetime
+from dateutil import parser
+from dateutil import tz 
+
 TEST_CHANNEL_ID=920858193624694874
 CONTROL_CHANNEL_ID=929202593882837022
 SRA_GUILD_ID=915686674833498203
@@ -367,8 +371,9 @@ car_model_dict = {
     61 : 'Porsche 718 Cayman GT4'
 }
 
-csv_header = f"Rank,Driver,ID,Car,Lap Time,Sector 1,Sector 2,Sector 3"
-csv_header_no_id = f"Rank,Driver,Car,Lap Time,Sector 1,Sector 2,Sector 3"
+#csv_header = f"Rank,Driver,ID,Car,Lap Time,Sector 1,Sector 2,Sector 3,Wet"
+csv_header = f"Rank,First Name, Last Name, Short Name,ID,Car,Car Model,Lap Time,Sector 1,Sector 2,Sector 3,Wet"
+csv_header_no_id = f"Rank,Driver,Car,Lap Time,Sector 1,Sector 2,Sector 3,Wet"
 
 html_string = """
 <html>
@@ -410,6 +415,7 @@ body
 
 """
 
+host_list = ["simracingalliance.emperorservers.com", "accsm.simracingalliance.com"]
 
 session_exclude = {
     "Silverstone": ['220203_033813_FP', '220203_043850_FP', '220207_002120_FP', '220206_194749_FP'],
@@ -420,3 +426,80 @@ session_exclude = {
     "Monza": [],
     "Paul Ricard": []
 }
+
+track_choices = [
+    "barcelona",
+    "brands_hatch",
+    "donington",
+    "hungaroring",
+    "imola",
+    "kyalami",
+    "laguna_seca",
+    "misano",
+    "monza",
+    "mount_panorama",
+    "nurburgring",
+    "oulton_park",
+    "paul_ricard",
+    "silverstone",
+    "snetterton",
+    "spa",
+    "suzuka",
+    "zolder",
+    "zandvoort"
+]
+
+pretty_name_raw_name = {
+    "Barcelona" : "barcelona",
+    "Brands Hatch" : "brands_hatch",
+    "Donington" : "donington",
+    "Hungaroring" : "hungaroring",
+    "Imola" : "imola",
+    "Kyalami" : "kyalami",
+    "Laguna Seca" : "laguna_seca",
+    "Misano" : "misano",
+    "Monza" : "monza",
+    "Mount Panorama" : "mount_panorama",
+    "Nurburgring" : "nurburgring",
+    "Oulton Park" : "oulton_park",
+    "Paul Ricard" : "paul_ricard",
+    "Silverstone" : "silverstone",
+    "Snetterton" : "snetterton",
+    "Spa" : "spa",
+    "Suzuka" : "suzuka",
+    "Zolder" : "zolder",
+    "Zandvoort" : "zandvoort",
+    "barcelona" : "Barcelona",
+    "brands_hatch" : "Brands Hatch",
+    "donington" : "Donington",
+    "hungaroring" : "Hungaroring",
+    "imola" : "Imola",
+    "kyalami" : "Kyalami",
+    "laguna_seca" : "Laguna Seca",
+    "misano" : "Misano",
+    "monza" : "Monza",
+    "mount_panorama" : "Mount Panorama",
+    "nurburgring" : "Nurburgring",
+    "oulton_park" : "Oulton Park",
+    "paul_ricard" : "Paul Ricard",
+    "silverstone" : "Silverstone",
+    "snetterton" : "Snetterton",
+    "spa" : "Spa",
+    "suzuka" : "Suzuka",
+    "zolder" : "Zolder",
+    "zandvoort" : "Zandvoort",
+}
+
+season_start_dates = {
+    1 : parser.isoparse("2022-01-25T00:00:00+0000"),
+    2 : parser.isoparse("2022-03-22T00:00:00+0000"),
+    3 : parser.isoparse("2022-05-31T00:00:00+0000")
+}
+
+season_end_dates = {
+    1 : parser.isoparse("2022-03-22T00:00:00+0000"),
+    2 : parser.isoparse("2022-05-31T00:00:00+0000"),
+    3 : datetime.now(tz=tz.UTC)
+}
+
+#https://simracingalliance.emperorservers.com/results?page=0&q=%2BZandvoort+%2BsessionResult.isWetSession%3A1+%2BDate%3A%3E%3D%222022-05-31T02%3A51%3A55Z%22&sort=date
