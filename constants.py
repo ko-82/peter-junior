@@ -1,12 +1,15 @@
 from datetime import datetime
 from dateutil import parser
-from dateutil import tz 
+from dateutil import tz
+from collections import namedtuple
 
 TEST_CHANNEL_ID=920858193624694874
 CONTROL_CHANNEL_ID=929202593882837022
 SRA_GUILD_ID=915686674833498203
 SRA_ADMIN_ROLE_ID=915687122608988181
 SRA_TECH_ROLE_ID=941515168960098455
+SRA_ACCEPT_EMOJI_ID=987218470036983838
+
 
 ST_U_H_ENTRY = "\
 Assuming pressures are correct.\n\
@@ -426,6 +429,9 @@ session_exclude = {
     "Monza": [],
     "Paul Ricard": []
 }
+
+ErrorCode = namedtuple("ErrorCode", "code message")
+LeaderboardParams = namedtuple("LeaderboardParams", "track condition season")
 
 track_choices = [
     "barcelona",

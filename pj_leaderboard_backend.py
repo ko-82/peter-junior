@@ -614,6 +614,7 @@ def main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bo
     else:
         r = leaderboard.post_leaderboard()
         print(r)
+    return 0
 
 def __main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
     print(ms_to_string(33235))
