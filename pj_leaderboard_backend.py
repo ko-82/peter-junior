@@ -427,7 +427,7 @@ class Leaderboard:
             rank += 1
         return leaderboard_str
 
-    def update(self, host:str, pages, pw = True, condition:Condition = Condition.ALL):
+    def update(self, host:str, pages, pw = True, condition:Condition = Condition.ALL) -> bool:
         """
         Update the leaderboard using data fetched from the server
 
@@ -492,8 +492,11 @@ class Leaderboard:
                 track = children[5].contents[0].strip()
                 #timestamp = datetime.datetime.strptime(timestamp_str, "%a, %d %b %Y %H:%M:%S %Z")
                 timestamp = dateutil.parser.parse(timestamp_str)
+                delta = timestamp - self.last_updated
+                updated = False
 
                 if ( (track == self.track) and ((pages != 8000) or (timestamp > self.last_updated)) ):   #If track matches and new
+                    updated = True
                     session = Session(host, filename)
                     session.get_session_results()
                     self.track_raw = session.track
@@ -538,7 +541,7 @@ class Leaderboard:
         print("#######################################################")
         if (self.entry_list):
             self.entry_list.sort(key=lambda x: x.best_time)
-        return
+        return updated
 
     def get_html_dir_path(self):
         return path.join(self.html_dir, f"{self.track}")

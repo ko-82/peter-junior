@@ -182,6 +182,10 @@ async def updateldb_single(
             "3" : 3
         }
     ),
+    pages:int = nextcord.SlashOption(
+        name="pages",
+        description="Override the amount of pages to scrape. Enter 0 to disable."
+    ),
     simulate:bool = nextcord.SlashOption(name="simulation", description="Simulation mode. Writes updated leaderboard to a file. Use this for testing")
 ):
     if not (interaction.user.get_role(constants.SRA_ADMIN_ROLE_ID) or interaction.user.get_role(constants.SRA_TECH_ROLE_ID)):
@@ -194,6 +198,7 @@ async def updateldb_single(
         embed.add_field(name="Track", value=track, inline=True)
         embed.add_field(name="Condition", value="Wet" if condition else "Dry", inline=True)
         embed.add_field(name="Season", value=season, inline=True)
+        embed.add_field(name="Pages override", value=pages)
         view = Confirm()
         await interaction.followup.send(embed=embed, view=view)
         await view.wait()
@@ -209,7 +214,7 @@ async def updateldb_single(
                     track=track, 
                     condition=condition, 
                     season=season, 
-                    pages=None, 
+                    pages=pages if pages else None, 
                     simulate=simulate
                 )
             )
