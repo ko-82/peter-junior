@@ -14,6 +14,7 @@ from dateutil import tz
 from os import path
 import pandas
 import pprint
+import keys
 
 
 def ms_to_string(ms:int) -> str:
@@ -355,7 +356,8 @@ class Leaderboard:
     def get_leaderboard(cls, season:int, track:str, condition:Condition = Condition.DRY):
         #https://www.simracingalliance.com/api/leaderboard/get/zandvoort/1?season=3
         url = f"https://www.simracingalliance.com/api/leaderboard/get/{constants.pretty_name_raw_name[track]}/{int(condition)}?season={season}"
-        r = requests.get(url=url)
+        headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'Bearer {keys.BEARER_TOKEN}'}
+        r = requests.get(url=url, headers=headers)
         c = r.content.decode(encoding='utf-8')
         ldb_dict = json.loads(c)
         if (("error" in ldb_dict) and ldb_dict["error"] == "leaderboard does not exist"):
@@ -599,7 +601,7 @@ class Leaderboard:
     def post_leaderboard(self):
         js = self.to_post_json()
         url = "https://www.simracingalliance.com/api/leaderboard/update"
-        headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
+        headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'Bearer {keys.BEARER_TOKEN}'}
         r = requests.post(url, data=json.dumps(js), headers=headers)
         return r
     
