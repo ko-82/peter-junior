@@ -505,7 +505,7 @@ season_start_dates = {
 season_end_dates = {
     1 : parser.isoparse("2022-03-22T00:00:00+0000"),
     2 : parser.isoparse("2022-05-31T00:00:00+0000"),
-    3 : datetime.now(tz=tz.UTC)
+    3 : parser.isoparse("2040-05-31T00:00:00+0000")
 }
 
 #https://simracingalliance.emperorservers.com/results?page=0&q=%2BZandvoort+%2BsessionResult.isWetSession%3A1+%2BDate%3A%3E%3D%222022-05-31T02%3A51%3A55Z%22&sort=date

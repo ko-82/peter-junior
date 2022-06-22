@@ -356,7 +356,7 @@ class Leaderboard:
     def get_leaderboard(cls, season:int, track:str, condition:Condition = Condition.DRY):
         #https://www.simracingalliance.com/api/leaderboard/get/zandvoort/1?season=3
         url = f"https://www.simracingalliance.com/api/leaderboard/get/{constants.pretty_name_raw_name[track]}/{int(condition)}?season={season}"
-        headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'Bearer {keys.BEARER_TOKEN}'}
+        headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'Bearer {keys.SRA_API_KEY}'}
         r = requests.get(url=url, headers=headers)
         c = r.content.decode(encoding='utf-8')
         ldb_dict = json.loads(c)
@@ -601,7 +601,7 @@ class Leaderboard:
     def post_leaderboard(self):
         js = self.to_post_json()
         url = "https://www.simracingalliance.com/api/leaderboard/update"
-        headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'Bearer {keys.BEARER_TOKEN}'}
+        headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'Bearer {keys.SRA_API_KEY}'}
         r = requests.post(url, data=json.dumps(js), headers=headers)
         return r
     
