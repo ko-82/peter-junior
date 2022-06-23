@@ -640,7 +640,7 @@ class Leaderboard:
         self.last_updated = datetime.datetime.now(datetime.timezone.utc)
 
 
-def __main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
+def main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
     leaderboard = Leaderboard.get_leaderboard(season=season, track=constants.pretty_name_raw_name[track], condition=condition)
     for host in constants.host_list:
         leaderboard.update(host=host, pages=pages, pw=False, condition=condition)
@@ -652,7 +652,7 @@ def __main(track:str, condition:int, season:int = 3, pages:int = None, simulate:
         print(r)
     return 0
 
-def main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
+def __main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
     #print(ms_to_string(33235))
     #leaderboard = Leaderboard.get_leaderboard(season=season, track=constants.pretty_name_raw_name[track], condition=condition)
     #leaderboard.update(host=constants.host_list[0], pages=pages, pw=False, condition=condition)
