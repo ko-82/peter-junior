@@ -284,7 +284,15 @@ class Leaderboard:
     """
     html_dir = "html"
 
-    def __init__(self, track:str = "", last_updated:datetime.datetime = None, entry_list:list[Entry] = None, file_path:str = "", condition:Condition = Condition.ALL, season:int = 3) -> None:
+    def __init__(
+        self, track:str = "", 
+        last_updated:datetime.datetime = None, 
+        entry_list:list[Entry] = None, 
+        file_path:str = "", 
+        condition:Condition = Condition.ALL, 
+        season:int = 3,
+        most_recent_sessions = {}
+    ) -> None:
         """
         Init the Leaderboard
 
@@ -301,6 +309,7 @@ class Leaderboard:
         self.file_path = file_path
         self.condition = condition
         self.season = season
+        self.most_recent_sessions = most_recent_sessions
 
     @classmethod
     def read_leaderboard(cls, track:str, file_path = None):
@@ -317,6 +326,7 @@ class Leaderboard:
         with open(file_path, "r", encoding='utf-8') as csv_file:
             line_count = 0
             csv_reader = csv.reader(csv_file, delimiter=',')
+            most_recent_sessions = {}
             for row in csv_reader:
                 if line_count == 0:
                     line_count += 1
@@ -326,6 +336,12 @@ class Leaderboard:
                         last_updated_str = row[0].split("?")[1]
                         line_count += 1
                         continue
+                    elif ("?MR?" in row[0]):
+                        host = row[1]
+                        timestamp = row[2]
+                        most_recent_sessions[host] = timestamp
+                        continue
+
                     best_time = datetime.datetime.strptime(row[7], "%M:%S.%f")
                     s1 = datetime.datetime.strptime(row[8], "%M:%S.%f")
                     s2 = datetime.datetime.strptime(row[9], "%M:%S.%f")
@@ -350,7 +366,7 @@ class Leaderboard:
                 line_count += 1
         #last_updated = datetime.datetime.strptime(last_updated_str, "%Y-%m-%dT%H:%M:%S%z")
         last_updated = dateutil.parser.parse(last_updated_str)
-        return cls(file_path=file_path, entry_list=entry_list, last_updated=last_updated, track=track)
+        return cls(file_path=file_path, entry_list=entry_list, last_updated=last_updated, track=track, most_recent_sessions=most_recent_sessions)
 
     @classmethod
     def get_leaderboard(cls, season:int, track:str, condition:Condition = Condition.DRY):
@@ -362,11 +378,12 @@ class Leaderboard:
         ldb_dict = json.loads(c)
         if (("error" in ldb_dict) and ldb_dict["error"] == "leaderboard does not exist"):
             print("Leaderboard does not exist. Returning empty leaderboard")
-            return cls(track=track, condition=condition, last_updated=datetime.datetime.fromtimestamp(0,tz=tz.UTC))
+            return cls(track=track, condition=condition, last_updated=datetime.datetime.fromtimestamp(0,tz=tz.UTC), most_recent_sessions=constants.epoch_most_recent)
 
         ldb_data = ldb_dict['data']['leaderboard_data']
         last_updated_str = ldb_dict['data']['leaderboard']['last_updated_iso_8601']
         last_updated = dateutil.parser.parse(last_updated_str).astimezone(tz.UTC)
+        most_recent_sessions = ldb_dict['data']['leaderboard']['most_recent_sessions']
         entry_list:list[Entry] = []
         for ldb_entry in ldb_data:
             entry = Entry()
@@ -390,7 +407,7 @@ class Leaderboard:
 
             entry_list.append(entry)
 
-        return cls(entry_list=entry_list, track=track, condition=condition, last_updated=last_updated, season=season)
+        return cls(entry_list=entry_list, track=track, condition=condition, last_updated=last_updated, season=season, most_recent_sessions=most_recent_sessions)
 
 
     def write_leaderboard(self, file_path: None, trail_trim = False):
@@ -409,7 +426,9 @@ class Leaderboard:
         with open(file_path, "w", encoding="utf-8") as file:
             last_updated_str = datetime.datetime.strftime(self.last_updated, "%Y-%m-%dT%H:%M:%S%z")
             file.write(self.__str__(trail_trim=trail_trim))
-            file.write(f"Last updated {last_updated_str}")
+            file.write(f"Last updated?{last_updated_str}\n")
+            for host in constants.host_list:
+                file.write(f"?MR?,{host},{self.most_recent_sessions[host]}\n")
 
     def __str__(self, trail_trim = False) -> str:
         """
@@ -453,6 +472,8 @@ class Leaderboard:
         dash_url = f"https://{host}/results"
         session_res_prefix = f"{dash_url}/"
         processed_all_new = False
+        most_recent_timestamp:datetime.datetime = None
+        ldb_most_recent:datetime.datetime = dateutil.parser.parse(self.most_recent_sessions[host])
         for page in range(0, pages):
             print(f"=====Processing page{page+1}=====")
             dash_query = build_query(
@@ -496,8 +517,10 @@ class Leaderboard:
                 timestamp = dateutil.parser.parse(timestamp_str)
                 delta = timestamp - self.last_updated
                 updated = False
+                if not most_recent_timestamp:
+                    most_recent_timestamp = timestamp
 
-                if ( (track == self.track) and ((pages != 8000) or (timestamp > self.last_updated)) ):   #If track matches and new
+                if ( (track == self.track) and ((pages != 8000) or (timestamp >= ldb_most_recent)) ):   #If track matches and new
                     updated = True
                     session = Session(host, filename)
                     session.get_session_results()
@@ -505,7 +528,7 @@ class Leaderboard:
                     if not session.results:
                         continue
                     if (condition != Condition.ALL):
-                        if (condition != session.iswet):
+                        if (self.condition != session.iswet):
                             print(f"DB: Condition doesn't match || {session_res_prefix}{filename}")
                             continue
                     if not self.entry_list:
@@ -529,7 +552,7 @@ class Leaderboard:
                 else:
                     if (track != self.track):
                         print(f"DB: Track doesn't match || {session_res_prefix}{filename}")
-                    elif (timestamp <= self.last_updated):
+                    elif (timestamp <= ldb_most_recent):
                         print(f"DB: Old session || {session_res_prefix}{filename}")
                         if (pages==8000):
                             print("Processed all new sessions. Stopping...")
@@ -539,6 +562,13 @@ class Leaderboard:
                         print(f"DB: Unknown error || {session_res_prefix}{filename}")
             print(f"=====Finished page{page+1}=====")
             if processed_all_new:
+                if (ldb_most_recent <= most_recent_timestamp):
+                    ldb_most_recent = most_recent_timestamp
+                    self.most_recent_sessions[host] = datetime.datetime.strftime(most_recent_timestamp, "%Y-%m-%dT%H:%M:%SZ")
+                else:
+                    print("Server most recent is older than leaderboard most recent. Aborting")
+                    print(f"{self.most_recent_sessions[host]} > {most_recent_timestamp}")
+                    return False
                 break
         print("#######################################################")
         if (self.entry_list):
@@ -571,7 +601,8 @@ class Leaderboard:
     def to_post_json(self):
         track_dict = {
             "name" : self.track_raw,
-            "is_wet": int(self.condition)
+            "is_wet": int(self.condition),
+            "most_recent_sessions" : self.most_recent_sessions
         }
         drivers_list = []
         entries_sorted = sorted(self.entry_list, key=lambda e:e.best_time)
@@ -609,7 +640,7 @@ class Leaderboard:
         self.last_updated = datetime.datetime.now(datetime.timezone.utc)
 
 
-def main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
+def __main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
     leaderboard = Leaderboard.get_leaderboard(season=season, track=constants.pretty_name_raw_name[track], condition=condition)
     for host in constants.host_list:
         leaderboard.update(host=host, pages=pages, pw=False, condition=condition)
@@ -621,20 +652,20 @@ def main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bo
         print(r)
     return 0
 
-def __main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
-    print(ms_to_string(33235))
+def main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
+    #print(ms_to_string(33235))
     #leaderboard = Leaderboard.get_leaderboard(season=season, track=constants.pretty_name_raw_name[track], condition=condition)
     #leaderboard.update(host=constants.host_list[0], pages=pages, pw=False, condition=condition)
     #leaderboard = Leaderboard.get_leaderboard(season=3, track="Zandvoort", condition=Condition.WET)
-    #leaderboard = Leaderboard.read_leaderboard("Donington", "empty_leaderboard.csv")
+    leaderboard = Leaderboard.read_leaderboard("Donington", "donington_POST.csv")
     #leaderboard.track = "Donington"
-    #leaderboard.condition = Condition.WET
-    #leaderboard.update(constants.host_list[0], pages=3, pw=False, condition=Condition.WET)
-    #leaderboard.update(host=constants.host_list[1], pages=3, pw=False, condition=Condition.WET)
-    #leaderboard.write_leaderboard("Zandvoort_POST2.csv", True)
-    #js = leaderboard.to_post_json()
-    #pp = pprint.PrettyPrinter(indent=4, sort_dicts=False, compact=False)
-    #pp.pprint(js)
+    leaderboard.condition = Condition.DRY
+    leaderboard.update(constants.host_list[0], pages=pages, pw=False, condition=Condition.DRY)
+    leaderboard.update(host=constants.host_list[1], pages=pages, pw=False, condition=Condition.DRY)
+    leaderboard.write_leaderboard("Donington.csv", True)
+    js = leaderboard.to_post_json()
+    pp = pprint.PrettyPrinter(indent=4, sort_dicts=False, compact=False)
+    pp.pprint(js)
     #r = leaderboard.post_leaderboard()
     #print(r)
 
