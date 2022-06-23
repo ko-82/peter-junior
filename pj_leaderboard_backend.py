@@ -378,7 +378,7 @@ class Leaderboard:
         ldb_dict = json.loads(c)
         if (("error" in ldb_dict) and ldb_dict["error"] == "leaderboard does not exist"):
             print("Leaderboard does not exist. Returning empty leaderboard")
-            return cls(track=track, condition=condition, last_updated=datetime.datetime.fromtimestamp(0,tz=tz.UTC), most_recent_sessions=constants.epoch_most_recent)
+            return cls(track=track, condition=condition, last_updated=datetime.datetime.fromtimestamp(0,tz=tz.UTC), most_recent_sessions=constants.season_starting_session_timestamps[season])
 
         ldb_data = ldb_dict['data']['leaderboard_data']
         last_updated_str = ldb_dict['data']['leaderboard']['last_updated_iso_8601']
@@ -562,14 +562,14 @@ class Leaderboard:
                         print(f"DB: Unknown error || {session_res_prefix}{filename}")
             print(f"=====Finished page{page+1}=====")
             if processed_all_new:
-                if (ldb_most_recent <= most_recent_timestamp):
-                    ldb_most_recent = most_recent_timestamp
-                    self.most_recent_sessions[host] = datetime.datetime.strftime(most_recent_timestamp, "%Y-%m-%dT%H:%M:%SZ")
-                else:
-                    print("Server most recent is older than leaderboard most recent. Aborting")
-                    print(f"{self.most_recent_sessions[host]} > {most_recent_timestamp}")
-                    return False
                 break
+        if (ldb_most_recent <= most_recent_timestamp):
+            ldb_most_recent = most_recent_timestamp
+            self.most_recent_sessions[host] = datetime.datetime.strftime(most_recent_timestamp, "%Y-%m-%dT%H:%M:%SZ")
+        else:
+            print("Server most recent is older than leaderboard most recent. Aborting")
+            print(f"{self.most_recent_sessions[host]} > {most_recent_timestamp}")
+            return False
         print("#######################################################")
         if (self.entry_list):
             self.entry_list.sort(key=lambda x: x.best_time)
@@ -654,10 +654,10 @@ def main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bo
 
 def __main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
     #print(ms_to_string(33235))
-    #leaderboard = Leaderboard.get_leaderboard(season=season, track=constants.pretty_name_raw_name[track], condition=condition)
+    leaderboard = Leaderboard.get_leaderboard(season=season, track=constants.pretty_name_raw_name[track], condition=condition)
     #leaderboard.update(host=constants.host_list[0], pages=pages, pw=False, condition=condition)
     #leaderboard = Leaderboard.get_leaderboard(season=3, track="Zandvoort", condition=Condition.WET)
-    leaderboard = Leaderboard.read_leaderboard("Donington", "donington_POST.csv")
+    #leaderboard = Leaderboard.read_leaderboard("Donington", "donington_POST.csv")
     #leaderboard.track = "Donington"
     leaderboard.condition = Condition.DRY
     leaderboard.update(constants.host_list[0], pages=pages, pw=False, condition=Condition.DRY)
