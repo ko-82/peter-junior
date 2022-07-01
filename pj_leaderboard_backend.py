@@ -643,7 +643,7 @@ class Leaderboard:
 def main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
     leaderboard = Leaderboard.get_leaderboard(season=season, track=constants.pretty_name_raw_name[track], condition=condition)
     for host in constants.host_list:
-        leaderboard.update(host=host, pages=pages, pw=False, condition=condition)
+        leaderboard.update(host=host, pages=pages, pw=True, condition=condition)
     leaderboard.finalize()
     if simulate:
         leaderboard.write_leaderboard(f"{track}_POST.csv", True)
