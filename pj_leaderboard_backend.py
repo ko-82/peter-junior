@@ -474,6 +474,7 @@ class Leaderboard:
         processed_all_new = False
         most_recent_timestamp:datetime.datetime = None
         ldb_most_recent:datetime.datetime = dateutil.parser.parse(self.most_recent_sessions[host])
+        updated = False
         for page in range(0, pages):
             print(f"=====Processing page{page+1}=====")
             dash_query = build_query(
@@ -516,7 +517,6 @@ class Leaderboard:
                 #timestamp = datetime.datetime.strptime(timestamp_str, "%a, %d %b %Y %H:%M:%S %Z")
                 timestamp = dateutil.parser.parse(timestamp_str)
                 delta = timestamp - self.last_updated
-                updated = False
                 if not most_recent_timestamp:
                     most_recent_timestamp = timestamp
 
@@ -563,13 +563,14 @@ class Leaderboard:
             print(f"=====Finished page{page+1}=====")
             if processed_all_new:
                 break
-        if (ldb_most_recent <= most_recent_timestamp):
-            ldb_most_recent = most_recent_timestamp
-            self.most_recent_sessions[host] = datetime.datetime.strftime(most_recent_timestamp, "%Y-%m-%dT%H:%M:%SZ")
-        else:
-            print("Server most recent is older than leaderboard most recent. Aborting")
-            print(f"{self.most_recent_sessions[host]} > {most_recent_timestamp}")
-            return False
+        if (most_recent_timestamp):
+            if (ldb_most_recent <= most_recent_timestamp):
+                ldb_most_recent = most_recent_timestamp
+                self.most_recent_sessions[host] = datetime.datetime.strftime(most_recent_timestamp, "%Y-%m-%dT%H:%M:%SZ")
+            else:
+                print("Server most recent is older than leaderboard most recent. Aborting")
+                print(f"{self.most_recent_sessions[host]} > {most_recent_timestamp}")
+                return False
         print("#######################################################")
         if (self.entry_list):
             self.entry_list.sort(key=lambda x: x.best_time)

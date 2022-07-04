@@ -461,7 +461,7 @@ track_choices = [
 pretty_name_raw_name = {
     "Barcelona" : "barcelona",
     "Brands Hatch" : "brands_hatch",
-    "COTA" : "cota",
+    "Cota" : "cota",
     "Donington" : "donington",
     "Hungaroring" : "hungaroring",
     "Imola" : "imola",
@@ -483,7 +483,7 @@ pretty_name_raw_name = {
     "Zandvoort" : "zandvoort",
     "barcelona" : "Barcelona",
     "brands_hatch" : "Brands Hatch",
-    "cota" : "COTA",
+    "cota" : "Cota",
     "donington" : "Donington",
     "hungaroring" : "Hungaroring",
     "imola" : "Imola",
@@ -519,16 +519,16 @@ season_end_dates = {
 
 season_starting_session_timestamps = {
     1: {
-        "simracingalliance.emperorservers.com" : season_start_dates[1],
-        "accsm.simracingalliance.com" : season_start_dates[1]
+        "simracingalliance.emperorservers.com" : "2022-01-25T00:00:00+0000",
+        "accsm.simracingalliance.com" : "2022-01-25T00:00:00+0000"
     },
     2: {
-        "simracingalliance.emperorservers.com" : season_start_dates[2],
-        "accsm.simracingalliance.com" : season_start_dates[2]
+        "simracingalliance.emperorservers.com" : "2022-03-22T00:00:00+0000",
+        "accsm.simracingalliance.com" : "2022-05-31T00:00:00+0000"
     },
     3: {
-        "simracingalliance.emperorservers.com" : season_start_dates[3],
-        "accsm.simracingalliance.com" : season_start_dates[3]
+        "simracingalliance.emperorservers.com" : "2022-05-31T00:00:00+0000",
+        "accsm.simracingalliance.com" : "2022-05-31T00:00:00+0000"
     },
 }
 

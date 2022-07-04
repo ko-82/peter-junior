@@ -146,9 +146,11 @@ async def updateldb_single(
         choices={
             "Barcelona" : "barcelona",
             "Brands Hatch" : "brands_hatch",
+            "Cota" : "cota",
             "Donington" : "donington",
             "Hungaroring" : "hungaroring",
             "Imola" : "imola",
+            "Indianapolis": "indianapolis",
             "Kyalami" : "kyalami",
             "Laguna Seca" : "laguna_seca",
             "Misano" : "misano",
@@ -161,6 +163,7 @@ async def updateldb_single(
             "Snetterton" : "snetterton",
             "Spa" : "spa",
             "Suzuka" : "suzuka",
+            "Watkins Glen" : "watkins_glen",
             "Zolder" : "zolder",
             "Zandvoort" : "zandvoort"
         },
@@ -249,9 +252,11 @@ async def get_current_ldb_params(
         choices={
             "Barcelona" : "barcelona",
             "Brands Hatch" : "brands_hatch",
+            "Cota" : "cota",
             "Donington" : "donington",
             "Hungaroring" : "hungaroring",
             "Imola" : "imola",
+            "Indianapolis": "indianapolis",
             "Kyalami" : "kyalami",
             "Laguna Seca" : "laguna_seca",
             "Misano" : "misano",
@@ -264,8 +269,9 @@ async def get_current_ldb_params(
             "Snetterton" : "snetterton",
             "Spa" : "spa",
             "Suzuka" : "suzuka",
+            "Watkins Glen" : "watkins_glen",
             "Zolder" : "zolder",
-            "Zandvoort" : "zandvoort"
+            "Zandvoort" : "zandvoort",
         },
         description="Track to update"
     ),
