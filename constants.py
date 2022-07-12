@@ -431,7 +431,8 @@ session_exclude = {
 }
 
 ErrorCode = namedtuple("ErrorCode", "code message")
-LeaderboardParams = namedtuple("LeaderboardParams", "track condition season")
+LeaderboardParams = namedtuple("LeaderboardParams", "track_set track condition season")
+#TrackParams = namedtuple("TrackParams", "name condition season")
 
 track_choices = [
     "barcelona",
@@ -503,6 +504,31 @@ pretty_name_raw_name = {
     "watkins_glen" : "Watkins Glen",
     "zolder" : "Zolder",
     "zandvoort" : "Zandvoort",
+}
+
+discord_track_choices = {
+    "Barcelona" : "barcelona",
+    "Brands Hatch" : "brands_hatch",
+    "Cota" : "cota",
+    "Donington" : "donington",
+    "Hungaroring" : "hungaroring",
+    "Imola" : "imola",
+    "Indianapolis": "indianapolis",
+    "Kyalami" : "kyalami",
+    "Laguna Seca" : "laguna_seca",
+    "Misano" : "misano",
+    "Monza" : "monza",
+    "Mount Panorama" : "mount_panorama",
+    "Nurburgring" : "nurburgring",
+    "Oulton Park" : "oulton_park",
+    "Paul Ricard" : "paul_ricard",
+    "Silverstone" : "silverstone",
+    "Snetterton" : "snetterton",
+    "Spa" : "spa",
+    "Suzuka" : "suzuka",
+    "Watkins Glen" : "watkins_glen",
+    "Zolder" : "zolder",
+    "Zandvoort" : "zandvoort",
 }
 
 season_start_dates = {
