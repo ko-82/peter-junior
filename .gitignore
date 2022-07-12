@@ -4,3 +4,8 @@ keys.py
 *.png
 *.sh
 venv/
+.vscode/
+*.csv
+*.txt
+*.html
+*.css

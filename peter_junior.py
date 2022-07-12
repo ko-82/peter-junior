@@ -1,27 +1,48 @@
+import asyncio
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+import functools
+
+from discord import SlashOption
 import constants
-import pj_leaderboard
+import pj_leaderboard_backend
 import keys
 
-from typing import NamedTuple, Type
 import collections
-import re
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timezone
 import math
-import argparse
-import urllib.parse
-from os import path
-import platform
 
 import nextcord
 from nextcord.ext.commands import context
-from nextcord.ext.commands.flags import convert_flag
-from nextcord import user
+from nextcord.ext import tasks
 from nextcord.ext import commands
+from nextcord import Intents
 
-from pyppeteer import launch
 
+# Define a simple View that gives us a confirmation menu
+class Confirm(nextcord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.value = None
 
-bot = commands.Bot(command_prefix='$$')
+    # When the confirm button is pressed, set the inner value to `True` and
+    # stop the View from listening to more input.
+    # We also send the user an ephemeral message that we're confirming their choice.
+    @nextcord.ui.button(label="Confirm", style=nextcord.ButtonStyle.green)
+    async def confirm(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
+        await interaction.response.send_message("Confirming", ephemeral=True)
+        self.value = True
+        self.stop()
+
+    # This one is similar to the confirmation button except sets the inner value to `False`
+    @nextcord.ui.button(label="Cancel", style=nextcord.ButtonStyle.grey)
+    async def cancel(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
+        await interaction.response.send_message("Cancelling", ephemeral=True)
+        self.value = False
+        self.stop()
+
+my_intents = Intents.default()
+my_intents.message_content = True
+bot = commands.Bot(command_prefix='$$', intents=my_intents)
 
 def calc_fuel(total_time:int, lap_time_str:str, fuel_per_lap:float):
     lap_time = datetime.strptime(lap_time_str, '%M:%S.%f')
@@ -35,47 +56,52 @@ def calc_fuel(total_time:int, lap_time_str:str, fuel_per_lap:float):
     
     return Fuel(total_fuel, total_fuel_fm)
 
-def get_leaderboard(track:str) -> pj_leaderboard.Leaderboard:
-    filename = path.join("csvs", f"{track}.csv")
-    leaderboard = pj_leaderboard.Leaderboard.read_leaderboard(file_path=filename)
-    leaderboard.track = track
-    return leaderboard
-
-async def pyp_html_screenshot(html_path, html_dir_path):
-    html_path_abs = path.abspath(html_path).replace("\\","/")
-    html_url = urllib.parse.quote(html_path_abs, safe=":/")
-    img_path = path.join(html_dir_path, "table.png")
-
-    if ("arm" in platform.machine()):
-        print("ARM")
-        browser = await launch({"executablePath": "/usr/bin/chromium-browser"})     #Pyppeteer uses x86 Chromium on ARM for some unholy reason
-    else:
-        browser = await launch(options={'args': ['--no-sandbox']})
-    print("Browser launched...")
-    page = await browser.newPage()
-    await page.setViewport({"width": 1280, "height": 720})
-    response = await page.goto(f"file:///{html_url}")
-    element = await page.querySelector(".ldb-table")
-    await element.screenshot(path=img_path)
-    print("Scr taken...")
-    await browser.close()
-    print("Browser closed...")
 
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
 
-@bot.command()
-async def ssshelp(ctx):
-    await ctx.channel.send("Good day. Peter Junior at your service")
-    await ctx.channel.send(
-        (
-            f"Available commands:"
-            f"$$setup help"
-            f"$$fuel"
+class LeaderboardCog(commands.Cog):
+    def __init__(self, bot) -> None:
+        self.bot = bot
+        self.track = ""
+        self.condition = 0
+        self.season = 3
+        self.simulate = False
+        super().__init__()
+    
+    async def set_params(self, track:str, condition:int, season:int):
+        self.track = track
+        self.condition = condition
+        self.season = season
+    
+    async def get_params(self) -> constants.LeaderboardParams:
+        return constants.LeaderboardParams(track=self.track, condition=self.condition, season=self.season)
+    
+    async def cog_update_leaderboard(self):
+        loop = asyncio.get_event_loop()
+        backend = await loop.run_in_executor(
+            ThreadPoolExecutor(),
+            functools.partial(
+                pj_leaderboard_backend.main,
+                track=self.track,
+                condition=self.condition,
+                season=self.season,
+                pages=None,
+                simulate=self.simulate
+            )
         )
-    )
-    return
+        return backend
+        #pj_leaderboard_backend.main(track=self.track, condition=self.condition, season=self.season, pages=None, simulate=simulate)
+    
+    @tasks.loop(hours=3)
+    async def loop_update_leaderboard(self):
+        if not self.track:
+            return constants.ErrorCode(1, "Track not set")
+        else:
+            await self.cog_update_leaderboard()
+
+bot.add_cog(LeaderboardCog(bot))
 
 @bot.command()
 async def setup(ctx, params:str):
@@ -85,97 +111,13 @@ async def setup(ctx, params:str):
         await ctx.channel.send(constants.setup_dict[params])
     return
 
-@bot.command()
-async def fuel(ctx, params:str):
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("total_time", type=int, nargs='?')
-    parser.add_argument("lap_time", type=str, nargs='?')
-    parser.add_argument("fuel_per_lap", type=float, nargs='?')
-    parser.add_argument("--help", action='store_true')
-    args = parser.parse_args(params.split())
-    print(args)
 
-    if (args.help):
-        await ctx.channel.send(
-            (
-                f"Calculate fuel based on race time and lap time\n"
-                f'Syntax: $$fuel "<total_time_in_mins> <lap_time> <fuel_per_lap>"\n'
-                f"Lap time must be in mm:ss.SSS format\n"
-                f'Example: $$fuel "60 02:21.500 3.8"\n'
-            )
-        )
-        return
-    if not (args.total_time and args.lap_time and args.fuel_per_lap):
-        print("Invalid syntax")
-        return
-    
-    fuel = calc_fuel(args.total_time, args.lap_time, args.fuel_per_lap)
-    await ctx.channel.send(
-        (
-            f"Total {args.total_time} minutes\n"
-            f"{args.lap_time} per lap\n"
-            f"{args.fuel_per_lap}L per lap\n"
-            f"Fuel needed: {fuel.min}L\n"
-            f"Fuel needed with full formation lap: {fuel.fm}L\n"
-        )
-    )
-    return
-
-@bot.command(name="updateldb")
-async def update_leaderboard(ctx, track, pages = 3, pw = True):
-    leaderboard = get_leaderboard(track=track)
-    leaderboard.update(pages=pages, pw=pw)
-    await ctx.channel.send("Updated")
-    leaderboard.write_leaderboard(path.join("csvs", f"{leaderboard.track}.csv"))
-
-@bot.command(name="printldb")
-async def print_leaderboard(ctx, track):
-    leaderboard = get_leaderboard(track=track)
-    leaderboard.write_leaderboard(file_path=path.join("print", f"{leaderboard.track}.txt"), suppress_id=True, space_delim=True, trail_trim=True)
-    await ctx.channel.send(file=nextcord.File(fp=path.join("print", f"{leaderboard.track}.txt")))
-    
-@bot.command(name="printldbshort")
-async def print_leaderboard_short(ctx, track):
-    leaderboard = get_leaderboard(track=track)
-    ldb_embed = leaderboard.generate_embed_compatible()
-    embed = nextcord.Embed(title=f"{leaderboard.track} leaderboard")
-    embed.add_field(name="Driver", value=ldb_embed.driver, inline=True)
-    embed.add_field(name="Car", value=ldb_embed.car, inline=True)
-    embed.add_field(name="Time", value=ldb_embed.time, inline=True)
-    embed.timestamp = leaderboard.last_updated
-
-    await ctx.channel.send(embed=embed)
-
-
-@bot.command(name="genscr")
-@commands.has_role('Admin')
-async def generate_screenshot(ctx, track):
-    leaderboard = get_leaderboard(track=track)
-    leaderboard.to_html()
-    print("HTML done")
-    await pyp_html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
-    print("Screenshot taken")
-
-    if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
-        await ctx.channel.send("No image file")
-    else:
-        with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
-            image = nextcord.File(f)
-            await ctx.channel.send(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
-    print("Done")
 
 @bot.command(name="db_timestamp")
 async def db_timestamp(ctx):
     now = datetime.now(timezone.utc)
     timestamp = now.timestamp()
     await ctx.channel.send(f"<t:{int(timestamp)}:F>")
-
-@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID])
-async def choose_a_number(
-    interaction: nextcord.Interaction,
-    number: str = nextcord.SlashOption(name="settings", description="Configure Your Settings")
-):
-    await interaction.response.send_message(f"You chose {number}")
 
 @bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="fuel")
 async def fuel_slash(
@@ -195,55 +137,296 @@ async def fuel_slash(
         )
     )
 
-@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="update_leaderboard")
-async def updateldb_slash(
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="update_leaderboard_single", description="Update a single leaderboard")
+async def updateldb_single(
     interaction: nextcord.Interaction,
-    track: str = nextcord.SlashOption(name="track", description="Track to update"),
-    pages: int = nextcord.SlashOption(name="pages", description="Number of pages to scrape"),
-    pw: bool = nextcord.SlashOption(name="pw", description="Limit to password protected sessions. Set to true unless you're Peter and you're messing around")
+    track:str = nextcord.SlashOption(
+        name="track",
+        choices={
+            "Barcelona" : "barcelona",
+            "Brands Hatch" : "brands_hatch",
+            "Cota" : "cota",
+            "Donington" : "donington",
+            "Hungaroring" : "hungaroring",
+            "Imola" : "imola",
+            "Indianapolis": "indianapolis",
+            "Kyalami" : "kyalami",
+            "Laguna Seca" : "laguna_seca",
+            "Misano" : "misano",
+            "Monza" : "monza",
+            "Mount Panorama" : "mount_panorama",
+            "Nurburgring" : "nurburgring",
+            "Oulton Park" : "oulton_park",
+            "Paul Ricard" : "paul_ricard",
+            "Silverstone" : "silverstone",
+            "Snetterton" : "snetterton",
+            "Spa" : "spa",
+            "Suzuka" : "suzuka",
+            "Watkins Glen" : "watkins_glen",
+            "Zolder" : "zolder",
+            "Zandvoort" : "zandvoort"
+        },
+        description="Track to update"
+    ),
+    condition:int = nextcord.SlashOption(
+        name="condition",
+        choices={
+            "Dry" : 0,
+            "Wet" : 1
+        },
+        description="Track condition"
+    ),
+    season:int = nextcord.SlashOption(
+        name="season",
+        choices={
+            "1" : 1,
+            "2" : 2,
+            "3" : 3
+        }
+    ),
+    pages:int = nextcord.SlashOption(
+        name="pages",
+        description="Override the amount of pages to scrape. Enter 0 to disable."
+    ),
+    simulate:bool = nextcord.SlashOption(name="simulation", description="Simulation mode. Writes updated leaderboard to a file. Use this for testing")
 ):
     if not (interaction.user.get_role(constants.SRA_ADMIN_ROLE_ID) or interaction.user.get_role(constants.SRA_TECH_ROLE_ID)):
         await interaction.response.send_message("You're not authorized to use this command")
     else:
         await interaction.response.defer()
-        #TODO: Figure out how to call bot.updateldb() from here
-        leaderboard = get_leaderboard(track=track)
-        leaderboard.update(pages=pages, pw=pw)
-        leaderboard.write_leaderboard(path.join("csvs", f"{leaderboard.track}.csv"))
-        await interaction.followup.send(f"Updated {pages} of {track} with password {pw}")
-        
-
-@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="print_leaderboard")
-async def print_leaderboard_slash(
-    interaction: nextcord.Interaction,
-    track: str = nextcord.SlashOption(name="track", description="Track to print the leaderboard for"),
-):
-    leaderboard = get_leaderboard(track=track)
-    leaderboard.write_leaderboard(file_path=path.join("print", f"{leaderboard.track}.txt"), suppress_id=True, space_delim=True, trail_trim=True)
-    await interaction.response.send_message(file=nextcord.File(fp=path.join("print", f"{leaderboard.track}.txt")))
-
-@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="generate_screenshot")
-async def generate_screenshot_slash(
-    interaction: nextcord.Interaction,
-    track: str = nextcord.SlashOption(name="track", description="Track to print the leaderboard for"),
-):
-    if not (interaction.user.get_role(constants.SRA_ADMIN_ROLE_ID) or interaction.user.get_role(constants.SRA_TECH_ROLE_ID)):
-        await interaction.response.send_message("You're not authorized to use this command")
-    else:
-        await interaction.response.defer()
-        leaderboard = get_leaderboard(track=track)
-        leaderboard.to_html()
-        print("HTML done")
-        await pyp_html_screenshot(leaderboard.get_html_path(), leaderboard.get_html_dir_path())
-        print("Screenshot taken")
-
-        if not path.exists(path.join(leaderboard.get_html_dir_path(), "table.png")):
-            await interaction.followup.send("No image file")
+        embed = nextcord.Embed()
+        embed.title = "Leaderboard update parameters"
+        embed.add_field(name="Simulation mode", value=simulate, inline=False)
+        embed.add_field(name="Track", value=track, inline=True)
+        embed.add_field(name="Condition", value="Wet" if condition else "Dry", inline=True)
+        embed.add_field(name="Season", value=season, inline=True)
+        embed.add_field(name="Pages override", value=pages)
+        view = Confirm()
+        await interaction.followup.send(embed=embed, view=view)
+        await view.wait()
+        if view.value is None:
+            print("Timed out...")
+        elif view.value:
+            print("Confirmed...")
+            loop = asyncio.get_event_loop()
+            backend = loop.run_in_executor(
+                ThreadPoolExecutor(), 
+                functools.partial(
+                    pj_leaderboard_backend.main, 
+                    track=track, 
+                    condition=condition, 
+                    season=season, 
+                    pages=pages if pages else None, 
+                    simulate=simulate
+                )
+            )
+            await interaction.channel.send(f"Updated ")
+            return backend
         else:
-            with open(path.join(leaderboard.get_html_dir_path(), "table.png"), "rb") as f:
-                image = nextcord.File(f)
-                await interaction.followup.send(f"Last updated: <t:{int(leaderboard.last_updated.timestamp())}:F>",file=image)
-        print("Done")
+            print("Cancelled...")
+    
+    
+    return
 
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="get_leaderboard_parameters", description="Get the periodic update parameters")
+async def get_current_ldb_params(interaction:nextcord.Interaction):
+    await interaction.response.defer()
+    embed = nextcord.Embed()
+    leaderboard:LeaderboardCog = bot.get_cog('LeaderboardCog')
+    if leaderboard is not None:
+        current_params = await leaderboard.get_params()
+        print(current_params)
+        embed = nextcord.Embed()
+        embed.title = "Leaderboard parameters"
+        embed.add_field(name="Current track", value=current_params.track if current_params.track else "None", inline=True)
+        embed.add_field(name="Current condition", value="Wet" if current_params.condition else "Dry", inline=True)
+        embed.add_field(name="Current season", value=current_params.season, inline=True)
+    await interaction.followup.send(embed=embed)
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="set_leaderboard_parameters", description="Get the periodic update parameters")
+async def get_current_ldb_params(
+    interaction:nextcord.Interaction,
+    track:str = nextcord.SlashOption(
+        name="track",
+        choices={
+            "Barcelona" : "barcelona",
+            "Brands Hatch" : "brands_hatch",
+            "Cota" : "cota",
+            "Donington" : "donington",
+            "Hungaroring" : "hungaroring",
+            "Imola" : "imola",
+            "Indianapolis": "indianapolis",
+            "Kyalami" : "kyalami",
+            "Laguna Seca" : "laguna_seca",
+            "Misano" : "misano",
+            "Monza" : "monza",
+            "Mount Panorama" : "mount_panorama",
+            "Nurburgring" : "nurburgring",
+            "Oulton Park" : "oulton_park",
+            "Paul Ricard" : "paul_ricard",
+            "Silverstone" : "silverstone",
+            "Snetterton" : "snetterton",
+            "Spa" : "spa",
+            "Suzuka" : "suzuka",
+            "Watkins Glen" : "watkins_glen",
+            "Zolder" : "zolder",
+            "Zandvoort" : "zandvoort",
+        },
+        description="Track to update"
+    ),
+    condition:int = nextcord.SlashOption(
+        name="condition",
+        choices={
+            "Dry" : 0,
+            "Wet" : 1
+        },
+        description="Track condition"
+    ),
+    season:int = nextcord.SlashOption(
+        name="season",
+        choices={
+            "1" : 1,
+            "2" : 2,
+            "3" : 3
+        }
+    )
+):
+    if not (interaction.user.get_role(constants.SRA_ADMIN_ROLE_ID) or interaction.user.get_role(constants.SRA_TECH_ROLE_ID)):
+        await interaction.response.send_message("You're not authorized to use this command")
+    else:
+        await interaction.response.defer()
+        leaderboard:LeaderboardCog = bot.get_cog('LeaderboardCog')
+        if leaderboard is not None:
+            current_params = await leaderboard.get_params()
+            print(current_params)
+            embed = nextcord.Embed()
+            embed.title = "Leaderboard update parameters"
+            embed.add_field(name="Current track", value=current_params.track if current_params.track else "None", inline=True)
+            embed.add_field(name="Current condition", value="Wet" if current_params.condition else "Dry", inline=True)
+            embed.add_field(name="Current season", value=current_params.season, inline=True)
+            embed.add_field(name="New track", value=track, inline=True)
+            embed.add_field(name="New condition", value="Wet" if condition else "Dry", inline=True)
+            embed.add_field(name="New season", value=season, inline=True)
+        else:
+            await interaction.followup.send("bot.get_cog('LeaderboardCog') returned None. Yell at Peter to troubleshoot")
+            return
+
+        view = Confirm()
+        await interaction.followup.send(embed=embed, view=view)
+        await view.wait()
+        if view.value is None:
+            print("Timed out...")
+        elif view.value:
+            print("Confirmed...")
+            if leaderboard is not None:
+                await leaderboard.set_params(track=track, condition=condition, season=season)
+                print(await leaderboard.get_params())
+        else:
+            print("Cancelled...")
+    
+    return
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="get_simulate_mode", description="Get simulation mode status")
+async def get_simulate(interaction:nextcord.Interaction):
+    await interaction.response.defer()
+    leaderboard:LeaderboardCog = bot.get_cog('LeaderboardCog')
+    if leaderboard is not None:
+        await interaction.followup.send(leaderboard.simulate)
+    else:
+        await interaction.followup.send("bot.get_cog('LeaderboardCog') returned None. Yell at Peter to troubleshoot")
+    return
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="set_simulate_mode", description="Set simulation mode status")
+async def set_simulate(
+    interaction:nextcord.Interaction,
+    simulate:bool = nextcord.SlashOption(name="simulation", description="Simulation mode. Writes updated leaderboard to a file. Use this for testing")
+):
+    await interaction.response.defer()
+    leaderboard:LeaderboardCog = bot.get_cog('LeaderboardCog')
+    if leaderboard is not None:
+        leaderboard.simulate = simulate
+        await interaction.followup.send(f"New simulate status:{leaderboard.simulate}")
+    else:
+        await interaction.followup.send("bot.get_cog('LeaderboardCog') returned None. Yell at Peter to troubleshoot")
+    return
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="start_update_loop", description="Start leaderboard update loop")
+async def start_update_loop(interaction:nextcord.Interaction):
+    await interaction.response.defer()
+    leaderboard:LeaderboardCog = bot.get_cog('LeaderboardCog')
+    if leaderboard is not None:
+        leaderboard.loop_update_leaderboard.start()
+        print("Loop started")
+        next_it = leaderboard.loop_update_leaderboard.next_iteration
+        if next_it:
+            next_it_timestamp = next_it.timestamp()
+            await interaction.followup.send(f"Loop started. Next iteration: <t:{int(next_it_timestamp)}:F>")
+        else:
+            await interaction.followup.send(f"Loop started")
+    else:
+        await interaction.followup.send("bot.get_cog('LeaderboardCog') returned None. Yell at Peter to troubleshoot")
+    return
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="stop_update_loop", description="Stop leaderboard update loop")
+async def stop_update_loop(interaction:nextcord.Interaction):
+    await interaction.response.defer()
+    leaderboard:LeaderboardCog = bot.get_cog('LeaderboardCog')
+    if leaderboard is not None:
+        leaderboard.loop_update_leaderboard.cancel()
+        await interaction.followup.send(f"Loop stopped")
+    else:
+        await interaction.followup.send("bot.get_cog('LeaderboardCog') returned None. Yell at Peter to troubleshoot")
+    return
+
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="loop_status", description="Get loop status")
+async def get_loop_status(interaction:nextcord.Interaction):
+    await interaction.response.defer()
+    leaderboard:LeaderboardCog = bot.get_cog('LeaderboardCog')
+    if leaderboard is not None:
+        current_params = await leaderboard.get_params()
+        print(current_params)
+        embed = nextcord.Embed()
+        embed.title = "Leaderboard parameters"
+        embed.add_field(name="Current track", value=current_params.track if current_params.track else "None", inline=True)
+        embed.add_field(name="Current condition", value="Wet" if current_params.condition else "Dry", inline=True)
+        embed.add_field(name="Current season", value=current_params.season, inline=True)
+        embed.add_field(name="Simulation mode", value=leaderboard.simulate, inline=True)
+        embed.add_field(name="Current iteration", value=leaderboard.loop_update_leaderboard.current_loop, inline=True)
+        next_it = leaderboard.loop_update_leaderboard.next_iteration
+        next_it_timestamp = 0.0
+        if next_it:
+            next_it_timestamp = next_it.timestamp()
+        embed.add_field(name="Next iteration", value=f"<t:{int(next_it_timestamp)}:F>" if next_it else "N/A", inline=True)
+        await interaction.followup.send(embed=embed)
+    else:
+        await interaction.followup.send("bot.get_cog('LeaderboardCog') returned None. Yell at Peter to troubleshoot")
+    return
+
+@tasks.loop(seconds=30)
+async def say_hi(greeting):
+    await bot.get_channel(constants.CONTROL_CHANNEL_ID).send(greeting)
+
+@bot.command()
+async def start_loop(ctx):
+    await ctx.channel.send("Started loop")
+    await say_hi.start("Howdy!")
+
+@bot.command()
+async def stop_loop(ctx):
+    await ctx.channel.send("Stopped loop")
+    say_hi.cancel()
+
+@bot.command()
+async def restart_loop(ctx):
+    await ctx.channel.send("Restarted loop")
+    say_hi.restart("Howdy!")
+
+@bot.command()
+async def check_loop(ctx):
+    if say_hi.is_running():
+        await ctx.channel.send("Loop running")
+    else:
+        await ctx.channel.send("Loop not running")
 
 bot.run(keys.BOT_TOKEN)
