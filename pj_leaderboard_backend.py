@@ -173,7 +173,7 @@ class Session:
         self.iswet = session_json_data['sessionResult']['isWetSession']
         laps = session_json_data['laps']
         if not laps:
-            print(f"DB: NO LAPS || {self.session_res_prefix}{self.filename}")
+            print(f"DB: NO LAPS || {self.session_res_prefix}{self.filename}", flush=True)
             return
 
         # Leaderboard lines are cars that were in the session
@@ -377,7 +377,7 @@ class Leaderboard:
         c = r.content.decode(encoding='utf-8')
         ldb_dict = json.loads(c)
         if (("error" in ldb_dict) and ldb_dict["error"] == "leaderboard does not exist"):
-            print("Leaderboard does not exist. Returning empty leaderboard")
+            print("Leaderboard does not exist. Returning empty leaderboard", flush=True)
             return cls(track=track, condition=condition, last_updated=datetime.datetime.fromtimestamp(0,tz=tz.UTC), most_recent_sessions=constants.season_starting_session_timestamps[season])
 
         ldb_data = ldb_dict['data']['leaderboard_data']
@@ -468,7 +468,7 @@ class Leaderboard:
         if not pages:
             pages = 8000
 
-        print(f"HOST: {host}")
+        print(f"HOST: {host}", flush=True)
         dash_url = f"https://{host}/results"
         session_res_prefix = f"{dash_url}/"
         processed_all_new = False
@@ -476,7 +476,7 @@ class Leaderboard:
         ldb_most_recent:datetime.datetime = dateutil.parser.parse(self.most_recent_sessions[host])
         updated = False
         for page in range(0, pages):
-            print(f"=====Processing page{page+1}=====")
+            print(f"=====Processing page{page+1}=====", flush=True)
             dash_query = build_query(
                 host=host, 
                 page=page, 
@@ -488,7 +488,7 @@ class Leaderboard:
             dash_request = requests.get(dash_query)
             #dash_request = requests.get(f"{dash_url}?page={page}&q={self.track_raw}&sort=date", allow_redirects=True)
             if (dash_request.status_code == 404):
-                print(f"404: {dash_url}?page={page}")
+                print(f"404: {dash_url}?page={page}", flush=True)
                 break
             dash_html = dash_request.content.decode("utf-8")
             soup = bs4.BeautifulSoup(dash_html, "html.parser")
@@ -498,7 +498,7 @@ class Leaderboard:
                 filename = row['data-href'].split('/')[2]
                 #track_excludes = constants.session_exclude[self.track]
                 if ((self.track in constants.session_exclude) and (filename in constants.session_exclude[self.track])):
-                    print(f"DB: Excluded session || {session_res_prefix}{filename}")
+                    print(f"DB: Excluded session || {session_res_prefix}{filename}", flush=True)
                     continue
                 session_res_url = f"{session_res_prefix}{filename}"
                 session_res_html = requests.get(session_res_url, allow_redirects=True).content.decode("utf-8")
@@ -507,9 +507,9 @@ class Leaderboard:
                     ("Password: sra" not in session_res_html) and 
                     ("SRA League race" not in session_res_html)
                 ):
-                    print(f"DB: No password || {session_res_prefix}{filename}")
+                    print(f"DB: No password || {session_res_prefix}{filename}", flush=True)
                     continue
-                print(f"Processing: {session_res_prefix}{filename}")
+                print(f"Processing: {session_res_prefix}{filename}", flush=True)
                 children = row.contents
                 timestamp_str = children[1].contents[0].strip()
                 session_type = children[3]
@@ -529,7 +529,7 @@ class Leaderboard:
                         continue
                     if (condition != Condition.ALL):
                         if (self.condition != session.iswet):
-                            print(f"DB: Condition doesn't match || {session_res_prefix}{filename}")
+                            print(f"DB: Condition doesn't match || {session_res_prefix}{filename}", flush=True)
                             continue
                     if not self.entry_list:
                         self.entry_list = session.results
@@ -551,16 +551,16 @@ class Leaderboard:
                             self.entry_list.append(session_entry)
                 else:
                     if (track != self.track):
-                        print(f"DB: Track doesn't match || {session_res_prefix}{filename}")
+                        print(f"DB: Track doesn't match || {session_res_prefix}{filename}", flush=True)
                     elif (timestamp <= ldb_most_recent):
-                        print(f"DB: Old session || {session_res_prefix}{filename}")
+                        print(f"DB: Old session || {session_res_prefix}{filename}", flush=True)
                         if (pages==8000):
-                            print("Processed all new sessions. Stopping...")
+                            print("Processed all new sessions. Stopping...", flush=True)
                             processed_all_new = True
                             break
                     else:
-                        print(f"DB: Unknown error || {session_res_prefix}{filename}")
-            print(f"=====Finished page{page+1}=====")
+                        print(f"DB: Unknown error || {session_res_prefix}{filename}", flush=True)
+            print(f"=====Finished page{page+1}=====", flush=True)
             if processed_all_new:
                 break
         if (most_recent_timestamp):
@@ -568,10 +568,10 @@ class Leaderboard:
                 ldb_most_recent = most_recent_timestamp
                 self.most_recent_sessions[host] = datetime.datetime.strftime(most_recent_timestamp, "%Y-%m-%dT%H:%M:%SZ")
             else:
-                print("Server most recent is older than leaderboard most recent. Aborting")
-                print(f"{self.most_recent_sessions[host]} > {most_recent_timestamp}")
+                print("Server most recent is older than leaderboard most recent. Aborting", flush=True)
+                print(f"{self.most_recent_sessions[host]} > {most_recent_timestamp}", flush=True)
                 return False
-        print("#######################################################")
+        print("#######################################################", flush=True)
         if (self.entry_list):
             self.entry_list.sort(key=lambda x: x.best_time)
         return updated
