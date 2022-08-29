@@ -376,7 +376,7 @@ class Leaderboard:
         r = requests.get(url=url, headers=headers)
         c = r.content.decode(encoding='utf-8')
         ldb_dict = json.loads(c)
-        if (("error" in ldb_dict) and ldb_dict["error"] == "leaderboard does not exist"):
+        if (("error" in ldb_dict) and ("does not exist" in ldb_dict["error"])):
             print("Leaderboard does not exist. Returning empty leaderboard", flush=True)
             return cls(track=track, condition=condition, last_updated=datetime.datetime.fromtimestamp(0,tz=tz.UTC), most_recent_sessions=constants.season_starting_session_timestamps[season])
 
