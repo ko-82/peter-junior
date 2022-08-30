@@ -51,19 +51,6 @@ my_intents = Intents.default()
 my_intents.message_content = True
 bot = commands.Bot(command_prefix='$$', intents=my_intents)
 
-def calc_fuel(total_time:int, lap_time_str:str, fuel_per_lap:float):
-    lap_time = datetime.strptime(lap_time_str, '%M:%S.%f')
-    lap_time_mins = lap_time.minute + lap_time.second/60 + lap_time.microsecond/60000000
-    laps = math.ceil(total_time/lap_time_mins) + 1
-    laps_fm = laps + 1
-    total_fuel = math.ceil(laps * fuel_per_lap)
-    total_fuel_fm = math.ceil(laps_fm * fuel_per_lap)
-    (f"Total {total_time} minutes\n{lap_time_mins}m per lap\n{fuel_per_lap}L per lap\nFuel needed: {total_fuel}L\nFuel needed with full formation lap: {total_fuel_fm}L")
-    Fuel = collections.namedtuple("Fuel", ["min", "fm"])
-    
-    return Fuel(total_fuel, total_fuel_fm)
-
-
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
@@ -73,7 +60,7 @@ class LeaderboardCog(commands.Cog):
         self.bot = bot
         self.track = ""
         self.condition = 0
-        self.season = 3
+        self.season = 4
         self.simulate = False
         self.track_set: set[TrackParams] = set()
         super().__init__()
@@ -146,40 +133,6 @@ class LeaderboardCog(commands.Cog):
 
 bot.add_cog(LeaderboardCog(bot))
 
-@bot.command()
-async def setup(ctx, params:str):
-    if (params not in constants.setup_dict.keys()):
-        await ctx.channel.send("Git gud kid")
-    else:
-        await ctx.channel.send(constants.setup_dict[params])
-    return
-
-
-
-@bot.command(name="db_timestamp")
-async def db_timestamp(ctx):
-    now = datetime.now(timezone.utc)
-    timestamp = now.timestamp()
-    await ctx.channel.send(f"<t:{int(timestamp)}:F>")
-
-@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="fuel")
-async def fuel_slash(
-    interaction: nextcord.Interaction,
-    total_time: int = nextcord.SlashOption(name="total_time", description="Total race time"),
-    lap_time: str = nextcord.SlashOption(name="lap_time", description="Average lap time in mm:ss.SSS format"),
-    fuel_per_lap: float = nextcord.SlashOption(name="fuel_per_lap", description="Fuel consumed per lap")
-):
-    total_fuel = calc_fuel(total_time, lap_time, fuel_per_lap)
-    await interaction.response.send_message(
-        (
-            f"Total {total_time} minutes\n"
-            f"{lap_time} per lap\n"
-            f"{fuel_per_lap}L per lap\n"
-            f"Fuel needed: {total_fuel.min}L\n"
-            f"Fuel needed with full formation lap: {total_fuel.fm}L\n"
-        )
-    )
-
 
 @bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="update_leaderboard_single", description="Update a single leaderboard")
 async def updateldb_single(
@@ -202,7 +155,8 @@ async def updateldb_single(
         choices={
             "1" : 1,
             "2" : 2,
-            "3" : 3
+            "3" : 3,
+            "4" : 4
         }
     ),
     pages:int = nextcord.SlashOption(
@@ -287,7 +241,8 @@ async def set_current_ldb_params(
         choices={
             "1" : 1,
             "2" : 2,
-            "3" : 3
+            "3" : 3,
+            "4" : 4
         }
     )
 ):
@@ -347,7 +302,8 @@ async def add_track_to_set(
         choices={
             "1" : 1,
             "2" : 2,
-            "3" : 3
+            "3" : 3,
+            "4" : 4
         }
     )
 ):
@@ -392,7 +348,8 @@ async def remove_track_from_set(
         choices={
             "1" : 1,
             "2" : 2,
-            "3" : 3
+            "3" : 3,
+            "4" : 4
         }
     )
 ):

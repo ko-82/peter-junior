@@ -290,7 +290,7 @@ class Leaderboard:
         entry_list:list[Entry] = None, 
         file_path:str = "", 
         condition:Condition = Condition.ALL, 
-        season:int = 3,
+        season:int = 4,
         most_recent_sessions = {}
     ) -> None:
         """
@@ -371,7 +371,7 @@ class Leaderboard:
     @classmethod
     def get_leaderboard(cls, season:int, track:str, condition:Condition = Condition.DRY):
         #https://www.simracingalliance.com/api/leaderboard/get/zandvoort/1?season=3
-        url = f"https://www.simracingalliance.com/api/leaderboard/get/{constants.pretty_name_raw_name[track]}/{int(condition)}?season={season}"
+        url = f"https://www.simracingalliance.com/api/hotlap/get/{constants.pretty_name_raw_name[track]}/{int(condition)}?season={season}"
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'Bearer {keys.SRA_API_KEY}'}
         r = requests.get(url=url, headers=headers)
         c = r.content.decode(encoding='utf-8')
@@ -505,7 +505,8 @@ class Leaderboard:
                 if (
                     pw and
                     ("Password: sra" not in session_res_html) and 
-                    ("SRA League race" not in session_res_html)
+                    ("SRA League race" not in session_res_html) and
+                    ("entry list" not in session_res_html)
                 ):
                     print(f"DB: No password || {session_res_prefix}{filename}", flush=True)
                     continue
@@ -632,7 +633,7 @@ class Leaderboard:
 
     def post_leaderboard(self):
         js = self.to_post_json()
-        url = "https://www.simracingalliance.com/api/leaderboard/update"
+        url = "https://www.simracingalliance.com/api/hotlap/update"
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'Bearer {keys.SRA_API_KEY}'}
         r = requests.post(url, data=json.dumps(js), headers=headers)
         return r
@@ -676,11 +677,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("track", type=str, choices=constants.track_choices, help="Track to update")
     parser.add_argument("condition", type=int, choices=[0,1], help="Track condition. 0 for dry. 1 for wet")
-    parser.add_argument("season", type=int, nargs='?', choices=[1,2,3], default=3, help="Leaderboard season")
+    parser.add_argument("season", type=int, nargs='?', choices=[1,2,3,4], default=4, help="Leaderboard season")
     parser.add_argument('--pages', type=int, help="Override amount of pages. Stop upon 404")
     parser.add_argument('--simulate', action='store_true', help="Simulation mode. Writes updated leaderboard to a file")
 
     #args = parser.parse_args("brands_hatch 0 --pages 7".split(' '))
     args = parser.parse_args()
     print(args)
-    main(track=args.track, condition=args.condition, pages=args.pages, simulate=args.simulate)
+    main(track=args.track, condition=args.condition, season=args.season, pages=args.pages, simulate=args.simulate)
