@@ -473,7 +473,10 @@ class Leaderboard:
         session_res_prefix = f"{dash_url}/"
         processed_all_new = False
         most_recent_timestamp:datetime.datetime = None
-        ldb_most_recent:datetime.datetime = dateutil.parser.parse(self.most_recent_sessions[host])
+        if host in self.most_recent_sessions:
+            ldb_most_recent:datetime.datetime = dateutil.parser.parse(self.most_recent_sessions[host])
+        else:
+            ldb_most_recent:datetime.datetime = dateutil.parser.parse("1970-01-01T00:00:00Z")
         updated = False
         for page in range(0, pages):
             print(f"=====Processing page{page+1}=====", flush=True)

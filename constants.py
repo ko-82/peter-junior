@@ -98,8 +98,7 @@ body
 
 """
 
-#host_list = ["simracingalliance.emperorservers.com", "accsm.simracingalliance.com"]
-host_list = ["accsm.simracingalliance.com", "accsm1.simracingalliance.com"]
+host_list = ["accsm1.simracingalliance.com", "accsm2.simracingalliance.com", "accsm3.simracingalliance.com"]
 
 session_exclude = {
     "Silverstone": ['220203_033813_FP', '220203_043850_FP', '220207_002120_FP', '220206_194749_FP'],
