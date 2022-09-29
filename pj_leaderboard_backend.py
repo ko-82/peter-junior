@@ -504,7 +504,7 @@ class Leaderboard:
                 session_res_html = requests.get(session_res_url, allow_redirects=True).content.decode("utf-8")
                 if (
                     pw and
-                    ("Password: sra" not in session_res_html) and 
+                    ("assword: sra" not in session_res_html) and 
                     ("SRA League race" not in session_res_html) and
                     ("entry list" not in session_res_html)
                 ):
