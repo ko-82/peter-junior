@@ -244,7 +244,9 @@ season_starting_session_timestamps = {
     4: {
         "simracingalliance.emperorservers.com" : "2022-08-01T00:00:00+0000",
         "accsm.simracingalliance.com" : "2022-08-01T00:00:00+0000",
-        "accsm1.simracingalliance.com" : "2022-08-01T00:00:00+0000"
+        "accsm1.simracingalliance.com" : "2022-08-01T00:00:00+0000",
+        "accsm2.simracingalliance.com" : "2022-08-01T00:00:00+0000",
+        "accsm3.simracingalliance.com" : "2022-08-01T00:00:00+0000"
     },
 }
 
