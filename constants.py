@@ -98,7 +98,7 @@ body
 
 """
 
-host_list = ["accsm1.simracingalliance.com", "accsm2.simracingalliance.com", "accsm3.simracingalliance.com"]
+host_list = ["accsm1.simracingalliance.com", "accsm2.simracingalliance.com", "accsm3.simracingalliance.com", "accsm4.simracingalliance.com"]
 
 session_exclude = {
     "Silverstone": ['220203_033813_FP', '220203_043850_FP', '220207_002120_FP', '220206_194749_FP'],
@@ -215,14 +215,16 @@ season_start_dates = {
     1 : parser.isoparse("2022-01-25T00:00:00+0000"),
     2 : parser.isoparse("2022-03-22T00:00:00+0000"),
     3 : parser.isoparse("2022-05-31T00:00:00+0000"),
-    4 : parser.isoparse("2022-08-01T00:00:00+0000")
+    4 : parser.isoparse("2022-08-01T00:00:00+0000"),
+    5 : parser.isoparse("2022-11-03T00:00:00+0000")
 }
 
 season_end_dates = {
     1 : parser.isoparse("2022-03-22T00:00:00+0000"),
     2 : parser.isoparse("2022-05-31T00:00:00+0000"),
     3 : parser.isoparse("2022-07-31T00:00:00+0000"),
-    4 : parser.isoparse("2040-05-31T00:00:00+0000")
+    4 : parser.isoparse("2022-11-02T23:59:59+0000"),
+    5 : parser.isoparse("2040-11-03T00:00:00+0000")
 }
 
 season_starting_session_timestamps = {
@@ -247,6 +249,14 @@ season_starting_session_timestamps = {
         "accsm1.simracingalliance.com" : "2022-08-01T00:00:00+0000",
         "accsm2.simracingalliance.com" : "2022-08-01T00:00:00+0000",
         "accsm3.simracingalliance.com" : "2022-08-01T00:00:00+0000"
+    },
+    5: {
+        "simracingalliance.emperorservers.com" : "2022-11-03T00:00:00+0000",
+        "accsm.simracingalliance.com" : "2022-11-03T00:00:00+0000",
+        "accsm1.simracingalliance.com" : "2022-11-03T00:00:00+0000",
+        "accsm2.simracingalliance.com" : "2022-11-03T00:00:00+0000",
+        "accsm3.simracingalliance.com" : "2022-11-03T00:00:00+0000",
+        "accsm4.simracingalliance.com" : "2022-11-03T00:00:00+0000"
     },
 }
 

@@ -156,14 +156,28 @@ async def updateldb_single(
             "1" : 1,
             "2" : 2,
             "3" : 3,
-            "4" : 4
+            "4" : 4,
+            "5" : 5
         }
     ),
     pages:int = nextcord.SlashOption(
         name="pages",
+        required=False,
+        default=0,
         description="Override the amount of pages to scrape. Enter 0 to disable."
     ),
-    simulate:bool = nextcord.SlashOption(name="simulation", description="Simulation mode. Writes updated leaderboard to a file. Use this for testing")
+    password:bool = nextcord.SlashOption(
+        name="password",
+        required=False,
+        default=True,
+        description="Closed lobby filter. Enabled by default. Disable only if you know what you're doing"
+    ),
+    simulate:bool = nextcord.SlashOption(
+        name="simulation", 
+        required=False,
+        default=False,
+        description="Simulation mode. Writes updated leaderboard to a file. Use this for testing"
+    )
 ):
     if not (interaction.user.get_role(constants.SRA_ADMIN_ROLE_ID) or interaction.user.get_role(constants.SRA_TECH_ROLE_ID)):
         await interaction.response.send_message("You're not authorized to use this command")
@@ -175,7 +189,8 @@ async def updateldb_single(
         embed.add_field(name="Track", value=track, inline=True)
         embed.add_field(name="Condition", value="Wet" if condition else "Dry", inline=True)
         embed.add_field(name="Season", value=season, inline=True)
-        embed.add_field(name="Pages override", value=pages)
+        embed.add_field(name="Pages override", value=pages, inline=True)
+        embed.add_field(name="Password filter", value = password)
         view = Confirm()
         await interaction.followup.send(embed=embed, view=view)
         await view.wait()
@@ -192,6 +207,7 @@ async def updateldb_single(
                     condition=condition, 
                     season=season, 
                     pages=pages if pages else None, 
+                    pw=password,
                     simulate=simulate
                 )
             )
@@ -242,7 +258,8 @@ async def set_current_ldb_params(
             "1" : 1,
             "2" : 2,
             "3" : 3,
-            "4" : 4
+            "4" : 4,
+            "5" : 5
         }
     )
 ):
@@ -303,7 +320,8 @@ async def add_track_to_set(
             "1" : 1,
             "2" : 2,
             "3" : 3,
-            "4" : 4
+            "4" : 4,
+            "5" : 5
         }
     )
 ):
@@ -349,7 +367,8 @@ async def remove_track_from_set(
             "1" : 1,
             "2" : 2,
             "3" : 3,
-            "4" : 4
+            "4" : 4,
+            "5" : 5
         }
     )
 ):

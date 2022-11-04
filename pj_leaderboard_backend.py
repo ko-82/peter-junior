@@ -378,7 +378,7 @@ class Leaderboard:
         ldb_dict = json.loads(c)
         if (("error" in ldb_dict) and ("does not exist" in ldb_dict["error"])):
             print("Leaderboard does not exist. Returning empty leaderboard", flush=True)
-            return cls(track=track, condition=condition, last_updated=datetime.datetime.fromtimestamp(0,tz=tz.UTC), most_recent_sessions=constants.season_starting_session_timestamps[season])
+            return cls(track=track, condition=condition, last_updated=datetime.datetime.fromtimestamp(0,tz=tz.UTC), most_recent_sessions=constants.season_starting_session_timestamps[season], season=season)
 
         ldb_data = ldb_dict['data']['leaderboard_data']
         last_updated_str = ldb_dict['data']['leaderboard']['last_updated_iso_8601']
@@ -645,10 +645,10 @@ class Leaderboard:
         self.last_updated = datetime.datetime.now(datetime.timezone.utc)
 
 
-def main(track:str, condition:int, season:int = 3, pages:int = None, simulate:bool = False):
+def main(track:str, condition:int, season:int = 5, pages:int = None, simulate:bool = False, pw:bool = True):
     leaderboard = Leaderboard.get_leaderboard(season=season, track=constants.pretty_name_raw_name[track], condition=condition)
     for host in constants.host_list:
-        leaderboard.update(host=host, pages=pages, pw=True, condition=condition)
+        leaderboard.update(host=host, pages=pages, pw=pw, condition=condition)
     leaderboard.finalize()
     if simulate:
         leaderboard.write_leaderboard(f"{track}_POST.csv", True)
@@ -680,11 +680,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("track", type=str, choices=constants.track_choices, help="Track to update")
     parser.add_argument("condition", type=int, choices=[0,1], help="Track condition. 0 for dry. 1 for wet")
-    parser.add_argument("season", type=int, nargs='?', choices=[1,2,3,4], default=4, help="Leaderboard season")
+    parser.add_argument("season", type=int, nargs='?', choices=[1,2,3,4,5], default=5, help="Leaderboard season")
     parser.add_argument('--pages', type=int, help="Override amount of pages. Stop upon 404")
+    parser.add_argument('--no-password', action='store_false', help="Disable password filter")
     parser.add_argument('--simulate', action='store_true', help="Simulation mode. Writes updated leaderboard to a file")
 
     #args = parser.parse_args("brands_hatch 0 --pages 7".split(' '))
     args = parser.parse_args()
     print(args)
-    main(track=args.track, condition=args.condition, season=args.season, pages=args.pages, simulate=args.simulate)
+    main(track=args.track, condition=args.condition, season=args.season, pages=args.pages, simulate=args.simulate, pw=args.no_password)
