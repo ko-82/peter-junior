@@ -610,6 +610,8 @@ class Leaderboard:
             "most_recent_sessions" : self.most_recent_sessions
         }
         drivers_list = []
+        if (not self.entry_list):
+            return None
         entries_sorted = sorted(self.entry_list, key=lambda e:e.best_time)
         rank = 1
         for entry in entries_sorted:
@@ -636,6 +638,8 @@ class Leaderboard:
 
     def post_leaderboard(self):
         js = self.to_post_json()
+        if not js:
+            return f"Empty leaderboard: {self.track}-{self.condition}-{self.season}"
         url = "https://www.simracingalliance.com/api/hotlap/update"
         headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'Bearer {keys.SRA_API_KEY}'}
         r = requests.post(url, data=json.dumps(js), headers=headers)

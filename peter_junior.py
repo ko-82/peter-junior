@@ -1,8 +1,9 @@
 import asyncio
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
-from copyreg import constructor
 import functools
 from threading import Thread
+import aiofiles
+import aiofiles.os
 
 from discord import SlashOption
 import constants
@@ -44,6 +45,20 @@ class Confirm(nextcord.ui.View):
 
 class TrackParams(collections.namedtuple("TrackParams", "track condition season")):
     __slots__ = ()
+    @classmethod
+    def from_string(cls, args_str:str):
+        args_list = args_str.split('-')
+        track = args_list[0]
+        condition = -1
+        if args_list[1]=='Dry':
+            condition = 0
+        if args_list[1]=='Wet':
+            condition = 1
+        season = int(args_list[2].split('S')[1])
+        if (track not in constants.pretty_name_raw_name) or (condition == -1) or (season < 1) or (season > 5):
+            print(f"Invalid args: {args_str}")
+            return None
+        return cls(track=track, condition=condition, season=season)
     def __str__(self) -> str:
         return f"{self.track}-{'Wet' if self.condition else 'Dry'}-S{self.season}"
 
@@ -74,7 +89,7 @@ class LeaderboardCog(commands.Cog):
         return constants.LeaderboardParams(track_set=self.track_set, track=self.track, condition=self.condition, season=self.season)
     
     async def add_track(self, track_params:TrackParams) -> bool:
-        if track_params.track not in constants.pretty_name_raw_name:
+        if (track_params.track not in constants.pretty_name_raw_name) or (track_params in self.track_set):
             return False
         self.track_set.add(track_params)
         return True
@@ -83,6 +98,16 @@ class LeaderboardCog(commands.Cog):
         if (not self.track_set) or (track_params not in self.track_set) or (track_params.track not in constants.pretty_name_raw_name):
             return False
         self.track_set.discard(track_params)
+        return True
+    
+    async def add_cfg_tracks(self, cfg_path:str) -> bool:
+        if not await aiofiles.os.path.exists(cfg_path):
+            print(f"{cfg_path} does not exist")
+            return False
+        async with aiofiles.open(cfg_path, mode='r') as cfg_file:
+            async for line in cfg_file:
+                track_params = TrackParams.from_string(line.strip())
+                await self.add_track(track_params)
         return True
     
     async def cog_update_leaderboard(self):
@@ -298,6 +323,23 @@ async def set_current_ldb_params(
     
     return
 
+@bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="add_tracks_from_cfg", description="Add track to periodic update group")
+async def add_tracks_from_cfg(
+    interaction:nextcord.Interaction,
+    cfg_path:str = nextcord.SlashOption(
+        name="cfg_path", 
+        required=False,
+        default="tracks.cfg",
+        description="Config file override"
+    ) 
+):
+    await interaction.response.defer()
+    leaderboard:LeaderboardCog = bot.get_cog('LeaderboardCog')
+    r = await leaderboard.add_cfg_tracks(cfg_path)
+    if r:
+        await interaction.followup.send("Successful")
+    else:
+        await interaction.followup.send("Failed")
 @bot.slash_command(guild_ids=[constants.SRA_GUILD_ID], name="add_track", description="Add track to periodic update group")
 async def add_track_to_set(
     interaction:nextcord.Interaction,
